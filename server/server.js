@@ -1,19 +1,21 @@
-const ws = require("nodejs-websocket");
-console.log("开始建立连接...")
+const WebSocket = require('ws');
 
-ws.createServer((connect) => {
-  connect.on("text", function (str) {
-    console.log("收到的信息为:" + str)
-    connect.sendText("success");
+const ws = new WebSocket.Server({port: 8080}, () => {
+  console.log('socket start');
+});
+
+let clients = [];
+ws.on('connection', (client) => {
+  clients.push(client);
+  console.log(clients.length)
+
+  client.on('message', (msg) => {
+    console.log('来自前端的数据：' + msg);
+    client.send('来自服务端');
+  });
+
+  client.on('close', (msg) => {
+    console.log('前端主动断开连接' + msg);
   })
+});
 
-  connect.on("close", function (code, reason) {
-    console.log("关闭连接")
-  });
-
-  connect.on("error", function (code, reason) {
-    console.log("异常关闭")
-  });
-}).listen(8080)
-
-console.log("WebSocket建立完毕")
