@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" @click="websocketsend('广播')">
+    <img alt="Vue logo" src="../assets/logo.png" @click="send">
   </div>
 </template>
 
@@ -9,38 +9,53 @@ export default {
   name: 'home',
   data() {
     return {
-      websock: null,
+      id: '1',
+      toId: '1',
     };
   },
   created() {
-    this.initWebSocket();
+    this.InitWebSocket();
   },
   destroyed() {
     this.websock.close()
   },
   methods: {
-    initWebSocket() {
-      this.websock = new WebSocket('ws://127.0.0.1:8080/');
-      this.websock.onmessage = this.websocketonmessage;
-      this.websock.onopen = this.websocketonopen;
-      this.websock.onerror = this.websocketonerror;
-      this.websock.onclose = this.websocketclose;
+    InitWebSocket() {
+      this.websock = new WebSocket('ws://127.0.0.1:8081/');
+      this.websock.onmessage = this.OnMessage;
+      this.websock.onopen = this.OnOpen;
+      this.websock.onerror = this.OnError;
+      this.websock.onclose = this.Onclose;
     },
-    websocketonopen() {
-      this.websocketsend('建立连接');
+    OnOpen() {
+      let data = {
+        type: 'login',
+        id: this.id
+      }
+      this.OnSend(data);
     },
-    websocketonerror() {
-      this.initWebSocket();
-    },
-    websocketonmessage(e) {
+    OnMessage(e) {
       console.log(e)
     },
-    websocketsend(Data) {
-      this.websock.send(Data);
+    OnSend(e) {
+      this.websock.send(JSON.stringify(e));
     },
-    websocketclose(e) {
+    OnError() {
+      this.InitWebSocket();
+    },
+    Onclose(e) {
       console.log('断开连接', e);
     },
+
+
+    send() {
+      let data = {
+        type: 'send',
+        id: this.id,
+        toId: this.toId
+      }
+      this.OnSend(data);
+    }
   }
 }
 </script>

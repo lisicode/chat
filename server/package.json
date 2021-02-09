@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "md5-node": "^1.0.1",
+    "mysql": "^2.18.1",
     "ws": "^7.4.3"
   }
 }
