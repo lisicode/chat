@@ -1,6 +1,17 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" @click="send">
+    <van-cell title="微聊" :border="false" center>
+      <template #right-icon>
+        <van-icon name="add-o" @click="add"/>
+      </template>
+    </van-cell>
+    <router-view></router-view>
+    <van-tabbar v-model="active" route>
+      <van-tabbar-item icon="chat-o" to="/home">聊天</van-tabbar-item>
+      <van-tabbar-item icon="friends-o" to="/m2">好友</van-tabbar-item>
+      <van-tabbar-item icon="like-o">朋友圈</van-tabbar-item>
+      <van-tabbar-item icon="setting-o">我的</van-tabbar-item>
+    </van-tabbar>
   </div>
 </template>
 
@@ -9,53 +20,22 @@ export default {
   name: 'home',
   data() {
     return {
-      id: '1',
-      toId: '1',
+      active: 0,
     };
   },
   created() {
-    this.InitWebSocket();
-  },
-  destroyed() {
-    this.websock.close()
+
   },
   methods: {
-    InitWebSocket() {
-      this.websock = new WebSocket('ws://127.0.0.1:8081/');
-      this.websock.onmessage = this.OnMessage;
-      this.websock.onopen = this.OnOpen;
-      this.websock.onerror = this.OnError;
-      this.websock.onclose = this.Onclose;
-    },
-    OnOpen() {
-      let data = {
-        type: 'login',
-        id: this.id
-      }
-      this.OnSend(data);
-    },
-    OnMessage(e) {
-      console.log(e)
-    },
-    OnSend(e) {
-      this.websock.send(JSON.stringify(e));
-    },
-    OnError() {
-      this.InitWebSocket();
-    },
-    Onclose(e) {
-      console.log('断开连接', e);
-    },
-
-
-    send() {
-      let data = {
-        type: 'send',
-        id: this.id,
-        toId: this.toId
-      }
-      this.OnSend(data);
+    add() {
+      this.$router.push('/m3')
     }
   }
 }
 </script>
+
+<style scoped lang="scss">
+.home {
+
+}
+</style>

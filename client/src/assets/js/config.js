@@ -13,6 +13,8 @@ const EnvironmentConfig = {
 // 接口编号
 const ApiConfig = {
   signIn: 'A001',
+  queryFriends: 'A002',
+  addFriends: 'A003'
 };
 
 // 环境定义

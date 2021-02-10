@@ -80,6 +80,33 @@ http.createServer((req, res) => {
           }
         });
         break;
+      case 'A002':
+        let queryFriendsAccount = `SELECT * FROM user WHERE account LIKE ${data.queryData}`;
+        connection().query(queryFriendsAccount, (err, result) => {
+          if (err) {
+            console.log('[SELECT ERROR] - ', err.message);
+            return false;
+          } else {
+            if (result.length) {
+              let sendData = {
+                status: '0000',
+                account: result[0].account
+              };
+              res.end(JSON.stringify(sendData));
+            } else {
+              let sendData = {
+                status: '0001',
+                msg: '此好友还没有注册'
+              };
+              res.end(JSON.stringify(sendData));
+            }
+          }
+        });
+
+        break
+      case 'A003':
+        console.log(data)
+          break
     }
   });
 }).listen(8080);

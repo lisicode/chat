@@ -40,7 +40,6 @@ export default {
   },
   methods: {
     onSubmit() {
-      console.log(this.signInData);
       Request({
         method: 'post',
         data: {
@@ -52,10 +51,14 @@ export default {
           SetLocalStorage(res.userData, 'userData');
           this.$router.push('/home')
         } else {
-          console.log(res.msg)
+          this.$notify({ type: 'danger', message: res.msg });
         }
       })
     },
   }
 }
 </script>
+
+<style scoped lang="scss">
+
+</style>

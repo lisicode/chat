@@ -1,0 +1,84 @@
+<template>
+  <div class="m3">
+    <van-field
+        v-model="queryData"
+        center
+        clearable
+        placeholder="请输入手机号码"
+    >
+      <template #button>
+        <van-button size="small" type="info" @click="query">查询</van-button>
+      </template>
+    </van-field>
+    <van-cell center v-if="friendsData">
+      <div class="item">
+        <img src="../../assets/logo.png" />
+        <span class="custom-title">{{ friendsData }}</span>
+      </div>
+      <template #right-icon>
+        <van-button size="small" type="info" @click="invite">邀请</van-button>
+      </template>
+    </van-cell>
+    <van-empty description="暂无好友信息" v-else />
+  </div>
+</template>
+
+<script>
+import {ApiConfig, Request, GetLocalStorage} from "@/assets/js/config";
+
+export default {
+  name: 'm3',
+  data() {
+    return {
+      queryData: '',
+      friendsData: null,
+    };
+  },
+  methods: {
+    query() {
+      Request({
+        method: 'post',
+        data: {
+          api: ApiConfig.queryFriends,
+          queryData: this.queryData
+        }
+      }).then(res => {
+        if (res.status === '0000') {
+          this.friendsData = res.account;
+        } else if (res.status === '0001') {
+          this.friendsData = null;
+        }
+      })
+    },
+    invite() {
+      Request({
+        method: 'post',
+        data: {
+          api: ApiConfig.addFriends,
+          account: GetLocalStorage('userData').account,
+          friendsData: this.friendsData
+        }
+      }).then(res => {
+        console.log(res)
+      })
+    }
+  }
+}
+</script>
+
+<style scoped lang="scss">
+.van-cell {
+  .item {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    img {
+      width: 30px;
+    }
+    span {
+      margin-left: 10px;
+      font-size: 12px;
+    }
+  }
+}
+</style>
