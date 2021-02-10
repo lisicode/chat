@@ -5,12 +5,13 @@
 </template>
 
 <script>
+import {ApiConfig, Request, GetLocalStorage} from "@/assets/js/config";
 export default {
   name: 'chat',
   data() {
     return {
-      id: '1',
-      toId: '1',
+      id: GetLocalStorage('userData').account,
+      toId: this.$route.query.account,
     };
   },
   created() {
@@ -31,7 +32,7 @@ export default {
       let data = {
         type: 'login',
         id: this.id
-      }
+      };
       this.OnSend(data);
     },
     OnMessage(e) {

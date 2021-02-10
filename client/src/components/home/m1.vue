@@ -1,5 +1,6 @@
 <template>
   <div class="m1">
+    <van-cell title="微聊" :border="false" />
     <van-empty description="暂无消息" />
   </div>
 </template>

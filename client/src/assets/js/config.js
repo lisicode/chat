@@ -14,7 +14,8 @@ const EnvironmentConfig = {
 const ApiConfig = {
   signIn: 'A001',
   queryFriends: 'A002',
-  addFriends: 'A003'
+  addFriends: 'A003',
+  getFriends: 'A004',
 };
 
 // 环境定义

@@ -1,22 +1,25 @@
 <template>
   <div class="m3">
-    <van-field
-        v-model="queryData"
-        center
-        clearable
-        placeholder="请输入手机号码"
-    >
-      <template #button>
-        <van-button size="small" type="info" @click="query">查询</van-button>
-      </template>
-    </van-field>
+    <van-form @submit="query">
+      <van-field
+              v-model="queryData"
+              center
+              clearable
+              placeholder="请输入手机号码"
+              :rules="[{ required: true, message: '请输入手机号码' }]"
+      >
+        <template #button>
+          <van-button size="small" type="info" native-type="submit">查询</van-button>
+        </template>
+      </van-field>
+    </van-form>
     <van-cell center v-if="friendsData">
       <div class="item">
         <img src="../../assets/logo.png" />
         <span class="custom-title">{{ friendsData }}</span>
       </div>
       <template #right-icon>
-        <van-button size="small" type="info" @click="invite">邀请</van-button>
+        <van-button size="small" type="info" @click="add">添加</van-button>
       </template>
     </van-cell>
     <van-empty description="暂无好友信息" v-else />
@@ -25,7 +28,6 @@
 
 <script>
 import {ApiConfig, Request, GetLocalStorage} from "@/assets/js/config";
-
 export default {
   name: 'm3',
   data() {
@@ -50,7 +52,7 @@ export default {
         }
       })
     },
-    invite() {
+    add() {
       Request({
         method: 'post',
         data: {
@@ -59,7 +61,11 @@ export default {
           friendsData: this.friendsData
         }
       }).then(res => {
-        console.log(res)
+        if (res.status === '0000') {
+          this.$notify({ type: 'success', message: res.msg });
+        } else if (res.status === '0001') {
+          this.$notify({ type: 'danger', message: res.msg });
+        }
       })
     }
   }

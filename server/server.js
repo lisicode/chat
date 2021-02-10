@@ -102,11 +102,81 @@ http.createServer((req, res) => {
             }
           }
         });
-
-        break
+        break;
       case 'A003':
-        console.log(data)
-          break
+        let queryFriendsList = `SELECT * FROM friends WHERE account LIKE ${data.account}`;
+        connection().query(queryFriendsList, (err, result) => {
+          if (err) {
+            console.log('[SELECT ERROR] - ', err.message);
+            return false;
+          } else {
+            if (result.length) {
+              let updateList = JSON.parse(result[0].list);
+              if(updateList.includes(data.friendsData)) {
+                let sendData = {
+                  status: '0001',
+                  msg: '已在好友列表中'
+                };
+                res.end(JSON.stringify(sendData));
+              } else {
+                updateList.push(data.friendsData);
+                let updateFriendsList = `UPDATE friends SET list = '${JSON.stringify(updateList)}' WHERE account = ${result[0].account}`;
+                connection().query(updateFriendsList, (err, result) => {
+                  if (err) {
+                    console.log('[SELECT ERROR] - ', err.message);
+                    return false;
+                  } else {
+                    let sendData = {
+                      status: '0000',
+                      msg: '添加成功'
+                    };
+                    res.end(JSON.stringify(sendData));
+                  }
+                });
+              }
+            } else {
+              let addList = [];
+              addList.push(data.friendsData);
+              let insertAnswer = `INSERT INTO friends(account, list) VALUES ('${data.account}', '${JSON.stringify(addList)}')`;
+              connection().query(insertAnswer, (err, result) => {
+                if (err) {
+                  console.log('[SELECT ERROR] - ', err.message);
+                  return false;
+                } else {
+                  let sendData = {
+                    status: '0000',
+                    msg: '添加成功'
+                  };
+                  res.end(JSON.stringify(sendData));
+                }
+              });
+            }
+          }
+        });
+        break;
+      case 'A004':
+        let getFriendsList = `SELECT * FROM friends WHERE account LIKE ${data.account}`;
+        connection().query(getFriendsList, (err, result) => {
+          if (err) {
+            console.log('[SELECT ERROR] - ', err.message);
+            return false;
+          } else {
+            if (result.length) {
+              let sendData = {
+                status: '0000',
+                friendsList: result[0].list
+              };
+              res.end(JSON.stringify(sendData));
+            } else {
+              let sendData = {
+                status: '0001',
+                msg: '暂无好友'
+              };
+              res.end(JSON.stringify(sendData));
+            }
+          }
+        });
+        break
     }
   });
 }).listen(8080);
@@ -115,9 +185,11 @@ http.createServer((req, res) => {
 const ws = new WebSocket.Server({port: 8081}, () => {
   console.log('socket start');
 });
+
 ws.on('connection', (client) => {
   let allUserData = [];
   client.on('message', (e) => {
+    console.log(e)
     let data = JSON.parse(e);
     if (data.type === 'login') {
       allUserData.push({

@@ -3,7 +3,7 @@ import VueRouter from 'vue-router'
 import login from '../views/login.vue'
 import home from '../views/home.vue'
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 const routes = [
   {
@@ -29,11 +29,16 @@ const routes = [
         component: () => import(/* webpackChunkName: "m3" */ '../components/home/m3.vue')
       }
     ]
+  },
+  {
+    path:'/chat',
+    name: 'chat',
+    component: () => import(/* webpackChunkName: "chat" */ '../views/chat.vue')
   }
-]
+];
 
 const router = new VueRouter({
   routes
-})
+});
 
 export default router

@@ -1,10 +1,5 @@
 <template>
   <div class="home">
-    <van-cell title="微聊" :border="false" center>
-      <template #right-icon>
-        <van-icon name="add-o" @click="add"/>
-      </template>
-    </van-cell>
     <router-view></router-view>
     <van-tabbar v-model="active" route>
       <van-tabbar-item icon="chat-o" to="/home">聊天</van-tabbar-item>
@@ -27,9 +22,7 @@ export default {
 
   },
   methods: {
-    add() {
-      this.$router.push('/m3')
-    }
+
   }
 }
 </script>

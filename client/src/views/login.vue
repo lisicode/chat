@@ -3,10 +3,10 @@
     <van-form @submit="onSubmit">
       <van-field
           v-model="signInData.account"
-          name="用户名"
-          label="用户名"
-          placeholder="用户名"
-          :rules="[{ required: true, message: '请输入手机号' }]"
+          name="手机号码"
+          label="手机号码"
+          placeholder="手机号码"
+          :rules="[{ required: true, message: '请输入手机号码' }]"
       />
       <van-field
           v-model="signInData.password"
