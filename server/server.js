@@ -188,9 +188,9 @@ let ws = new WebSocket.Server({port: 8081}, () => {
       let data = JSON.parse(e);
       switch (data.type) {
         case 'login':
-          for (let s in allUserData) {
-            if (allUserData[s].id === data.id) {
-              allUserData.splice(s,1)
+          for (let i in allUserData) {
+            if (allUserData[i].id === data.id) {
+              allUserData.splice(i,1)
             }
           }
           allUserData.push({
@@ -200,9 +200,9 @@ let ws = new WebSocket.Server({port: 8081}, () => {
           console.log('连接成功' + '当前'+ allUserData.length +'个用户在线');
           break;
         case 'send':
-          for (let i in allUserData) {
-            if (allUserData[i].id === data.toId) {
-              allUserData[i].ws.send('来自' + data.msg + '的消息')
+          for (let s in allUserData) {
+            if (allUserData[s].id === data.toId) {
+              allUserData[s].ws.send('来自' + allUserData[s].id + '的' + data.msg + '消息')
             }
           }
           break;
