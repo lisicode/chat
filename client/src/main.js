@@ -7,8 +7,8 @@ import VueAxios from 'vue-axios'
 import Vant from 'vant';
 import 'vant/lib/index.css';
 
-Vue.config.productionTip = false
-Vue.use(VueAxios, axios)
+Vue.config.productionTip = false;
+Vue.use(VueAxios, axios);
 Vue.prototype.$axios = axios;
 Vue.use(Vant);
 
@@ -16,4 +16,4 @@ new Vue({
   router,
   store,
   render: h => h(App)
-}).$mount('#app')
+}).$mount('#app');

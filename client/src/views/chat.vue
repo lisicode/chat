@@ -57,7 +57,6 @@ export default {
     },
     Onclose(e) {
       console.log('断开连接', e);
-      this.OnOpen();
     },
     send() {
       let data = {
