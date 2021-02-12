@@ -35,7 +35,6 @@
           account: GetLocalStorage('userData').account
         }
       }).then(res => {
-
         this.list = JSON.parse(res.friendsList);
       })
     },

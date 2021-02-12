@@ -32,7 +32,7 @@ http.createServer((req, res) => {
     switch (data.api) {
       case 'A001':
         let querySignInAccount = `SELECT * FROM user WHERE account LIKE ${data.signInData.account}`;
-        let signInAccount = `INSERT INTO user(account, password) VALUES ('${data.signInData.account}', '${md5(data.signInData.password)}')`;
+        let signInAccount = `INSERT INTO user(account, password, friends) VALUES ('${data.signInData.account}', '${md5(data.signInData.password)}', '[]')`;
         connection().query(querySignInAccount, (err, result) => {
           if (err) {
             console.log('[SELECT ERROR] - ', err.message);
@@ -104,41 +104,24 @@ http.createServer((req, res) => {
         });
         break;
       case 'A003':
-        let queryFriendsList = `SELECT * FROM friends WHERE account LIKE ${data.account}`;
+        let queryFriendsList = `SELECT * FROM user WHERE account LIKE ${data.account}`;
         connection().query(queryFriendsList, (err, result) => {
           if (err) {
             console.log('[SELECT ERROR] - ', err.message);
             return false;
           } else {
-            if (result.length) {
-              let updateList = JSON.parse(result[0].list);
-              if(updateList.includes(data.friendsData)) {
-                let sendData = {
-                  status: '0001',
-                  msg: '已在好友列表中'
-                };
-                res.end(JSON.stringify(sendData));
-              } else {
-                updateList.push(data.friendsData);
-                let updateFriendsList = `UPDATE friends SET list = '${JSON.stringify(updateList)}' WHERE account = ${result[0].account}`;
-                connection().query(updateFriendsList, (err, result) => {
-                  if (err) {
-                    console.log('[SELECT ERROR] - ', err.message);
-                    return false;
-                  } else {
-                    let sendData = {
-                      status: '0000',
-                      msg: '添加成功'
-                    };
-                    res.end(JSON.stringify(sendData));
-                  }
-                });
-              }
+            let updateList = JSON.parse(result[0].friends);
+            if (updateList.includes(data.friendsData)) {
+              let sendData = {
+                status: '0001',
+                msg: '已在好友列表中'
+              };
+              res.end(JSON.stringify(sendData));
             } else {
-              let addList = [];
-              addList.push(data.friendsData);
-              let insertAnswer = `INSERT INTO friends(account, list) VALUES ('${data.account}', '${JSON.stringify(addList)}')`;
-              connection().query(insertAnswer, (err, result) => {
+              // 添加好友
+              updateList.push(data.friendsData);
+              let addFriends = `UPDATE user SET friends = '${JSON.stringify(updateList)}' WHERE account = ${data.account}`;
+              connection().query(addFriends, (err, result) => {
                 if (err) {
                   console.log('[SELECT ERROR] - ', err.message);
                   return false;
@@ -148,6 +131,26 @@ http.createServer((req, res) => {
                     msg: '添加成功'
                   };
                   res.end(JSON.stringify(sendData));
+                  // 添加对方
+                  let addOther = `SELECT * FROM user WHERE account LIKE ${data.friendsData}`;
+                  connection().query(addOther, (err, result) => {
+                    if (err) {
+                      console.log('[SELECT ERROR] - ', err.message);
+                      return false;
+                    } else {
+                      let updateList = JSON.parse(result[0].friends);
+                      updateList.push(data.account);
+                      let addFriends = `UPDATE user SET friends = '${JSON.stringify(updateList)}' WHERE account = ${data.friendsData}`;
+                      connection().query(addFriends, (err, result) => {
+                        if (err) {
+                          console.log('[SELECT ERROR] - ', err.message);
+                          return false;
+                        } else {
+                          console.log(result)
+                        }
+                      });
+                    }
+                  })
                 }
               });
             }
@@ -155,7 +158,7 @@ http.createServer((req, res) => {
         });
         break;
       case 'A004':
-        let getFriendsList = `SELECT * FROM friends WHERE account LIKE ${data.account}`;
+        let getFriendsList = `SELECT * FROM user WHERE account LIKE ${data.account}`;
         connection().query(getFriendsList, (err, result) => {
           if (err) {
             console.log('[SELECT ERROR] - ', err.message);
@@ -164,7 +167,7 @@ http.createServer((req, res) => {
             if (result.length) {
               let sendData = {
                 status: '0000',
-                friendsList: result[0].list
+                friendsList: result[0].friends
               };
               res.end(JSON.stringify(sendData));
             } else {
@@ -190,19 +193,19 @@ let ws = new WebSocket.Server({port: 8081}, () => {
         case 'login':
           for (let i in allUserData) {
             if (allUserData[i].id === data.id) {
-              allUserData.splice(i,1)
+              allUserData.splice(i, 1)
             }
           }
           allUserData.push({
             id: data.id,
             ws: client
           });
-          console.log('连接成功' + '当前'+ allUserData.length +'个用户在线');
+          console.log('连接成功' + '当前' + allUserData.length + '个用户在线');
           break;
         case 'send':
           for (let s in allUserData) {
             if (allUserData[s].id === data.toId) {
-              allUserData[s].ws.send('来自' + allUserData[s].id + '的' + data.msg + '消息')
+              allUserData[s].ws.send(data.msg)
             }
           }
           break;
