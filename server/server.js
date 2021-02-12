@@ -181,40 +181,36 @@ http.createServer((req, res) => {
   });
 }).listen(8080);
 
-
-const ws = new WebSocket.Server({port: 8081}, () => {
-  console.log('socket start');
-});
-
-let allUserData = [];
-ws.on('connection', (client) => {
-  client.on('message', (e) => {
-    let data = JSON.parse(e);
-    switch (data.type) {
-      case 'login':
-        for (let s in allUserData) {
-          if (allUserData[s].id === data.id) {
-            return
+let ws = new WebSocket.Server({port: 8081}, () => {
+  let allUserData = [];
+  ws.on('connection', (client) => {
+    client.on('message', (e) => {
+      let data = JSON.parse(e);
+      switch (data.type) {
+        case 'login':
+          for (let s in allUserData) {
+            if (allUserData[s].id === data.id) {
+              allUserData.splice(s,1)
+            }
           }
-        }
-        allUserData.push({
-          id: data.id,
-          ws: client
-        });
-        console.log('连接成功');
-        break;
-      case 'send':
-        for (let i in allUserData) {
-          if (allUserData[i].id === data.toId) {
-            allUserData[i].ws.send('来自' + data.msg + '的消息')
+          allUserData.push({
+            id: data.id,
+            ws: client
+          });
+          console.log('连接成功' + '当前'+ allUserData.length +'个用户在线');
+          break;
+        case 'send':
+          for (let i in allUserData) {
+            if (allUserData[i].id === data.toId) {
+              allUserData[i].ws.send('来自' + data.msg + '的消息')
+            }
           }
-        }
-        break;
-    }
+          break;
+      }
+    });
+    client.on('close', (msg) => {
+      console.log('前端主动断开连接' + msg);
+    })
   });
-
-  client.on('close', (msg) => {
-    console.log('前端主动断开连接' + msg);
-  })
 });
 
