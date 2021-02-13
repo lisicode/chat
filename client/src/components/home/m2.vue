@@ -7,7 +7,7 @@
         </template>
       </van-cell>
     </header>
-    <van-cell v-for="i in list" @click="toChat(i)">
+    <van-cell v-for="(i, index) in list" :key="index" @click="toChat(i)">
       <div class="item">
         <img src="../../assets/logo.png"/>
         <span class="custom-title">{{ i }}</span>
