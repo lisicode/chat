@@ -6,7 +6,7 @@
               center
               clearable
               placeholder="请输入手机号码"
-              :rules="[{ required: true, message: '请输入手机号码' }]"
+              :rules="[{ required: true }]"
       >
         <template #button>
           <van-button size="small" type="info" native-type="submit">查询</van-button>
