@@ -74,7 +74,6 @@ export default {
 <style scoped lang="scss">
   .c-1 {
     width: 100%;
-    height: 500px;
   }
  footer {
    width: 100%;
