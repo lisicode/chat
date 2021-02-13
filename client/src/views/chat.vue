@@ -61,6 +61,7 @@ export default {
     send() {
       let data = {
         type: 'send',
+        id: GetLocalStorage('userData').account,
         toId: this.$route.query.account,
         msg: this.msg
       };

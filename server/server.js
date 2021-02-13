@@ -104,6 +104,7 @@ http.createServer((req, res) => {
         });
         break;
       case 'A003':
+        // 查询添加人好友列表
         let queryFriendsList = `SELECT * FROM user WHERE account LIKE ${data.account}`;
         connection().query(queryFriendsList, (err, result) => {
           if (err) {
@@ -126,29 +127,37 @@ http.createServer((req, res) => {
                   console.log('[SELECT ERROR] - ', err.message);
                   return false;
                 } else {
-                  let sendData = {
-                    status: '0000',
-                    msg: '添加成功'
-                  };
-                  res.end(JSON.stringify(sendData));
-                  // 添加对方
+                  // 查询被添加人好友列表
                   let addOther = `SELECT * FROM user WHERE account LIKE ${data.friendsData}`;
                   connection().query(addOther, (err, result) => {
                     if (err) {
                       console.log('[SELECT ERROR] - ', err.message);
                       return false;
                     } else {
+                      // 添加对方
                       let updateList = JSON.parse(result[0].friends);
-                      updateList.push(data.account);
-                      let addFriends = `UPDATE user SET friends = '${JSON.stringify(updateList)}' WHERE account = ${data.friendsData}`;
-                      connection().query(addFriends, (err, result) => {
-                        if (err) {
-                          console.log('[SELECT ERROR] - ', err.message);
-                          return false;
-                        } else {
-                          console.log(result)
-                        }
-                      });
+                      if (updateList.includes(data.account)) {
+                        let sendData = {
+                          status: '0001',
+                          msg: '已在好友列表中'
+                        };
+                        res.end(JSON.stringify(sendData));
+                      } else {
+                        updateList.push(data.account);
+                        let addFriends = `UPDATE user SET friends = '${JSON.stringify(updateList)}' WHERE account = ${data.friendsData}`;
+                        connection().query(addFriends, (err, result) => {
+                          if (err) {
+                            console.log('[SELECT ERROR] - ', err.message);
+                            return false;
+                          } else {
+                            let sendData = {
+                              status: '0000',
+                              msg: '添加成功'
+                            };
+                            res.end(JSON.stringify(sendData));
+                          }
+                        });
+                      }
                     }
                   })
                 }
@@ -205,7 +214,7 @@ let ws = new WebSocket.Server({port: 8081}, () => {
         case 'send':
           for (let s in allUserData) {
             if (allUserData[s].id === data.toId) {
-              allUserData[s].ws.send(data.msg)
+              allUserData[s].ws.send('已接收来自' + data.id + '的' + data.msg)
             }
           }
           break;
