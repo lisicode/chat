@@ -1,18 +1,28 @@
 <template>
   <div class="chat">
-    <div class="c-1"></div>
-    <footer>
-      <van-field
-              v-model="msg"
-              center
-              clearable
-              placeholder="请输入消息"
-      >
-        <template #button>
-          <van-button size="small" type="primary" @click="send">发送</van-button>
-        </template>
-      </van-field>
-    </footer>
+    <van-nav-bar :title="this.$route.query.account" left-arrow />
+    <div class="c-1">
+      <div v-for="i in mq" :class="i.class">
+        <div>
+          {{ i.msg }}
+        </div>
+      </div>
+    </div>
+    <div class="c-2">
+      <van-form @submit="OnSend">
+        <van-field
+                v-model="msg"
+                center
+                clearable
+                placeholder="请输入消息"
+                :rules="[{ required: true }]"
+        >
+          <template #button>
+            <van-button size="small" type="primary" native-type="submit">发送</van-button>
+          </template>
+        </van-field>
+      </van-form>
+    </div>
   </div>
 </template>
 
@@ -22,7 +32,8 @@ export default {
   name: 'chat',
   data() {
     return {
-      msg: ''
+      msg: '',
+      mq: []
     };
   },
   created() {
@@ -37,45 +48,86 @@ export default {
       this.websock.onmessage = this.OnMessage;
       this.websock.onopen = this.OnOpen;
       this.websock.onerror = this.OnError;
-      this.websock.onclose = this.Onclose;
+      this.websock.onclose = this.OnClose;
     },
     OnOpen() {
       let data = {
         type: 'login',
         id: GetLocalStorage('userData').account
       };
-      this.OnSend(data);
-    },
-    OnMessage(e) {
-      console.log(e)
-    },
-    OnSend(e) {
-      this.websock.send(JSON.stringify(e));
+      this.websock.send(JSON.stringify(data));
     },
     OnError() {
       this.InitWebSocket();
     },
-    Onclose(e) {
+    OnClose(e) {
       console.log('断开连接', e);
     },
-    send() {
+
+
+
+    OnMessage(e) {
+      console.log(e)
+      this.mq.push({
+        class: 'b',
+        msg: e.data
+      });
+    },
+    OnSend() {
       let data = {
         type: 'send',
         id: GetLocalStorage('userData').account,
         toId: this.$route.query.account,
         msg: this.msg
       };
-      this.OnSend(data);
+      this.mq.push({
+        class: 'a',
+        msg: this.msg
+      });
+      this.websock.send(JSON.stringify(data));
     },
+
+
   }
 }
 </script>
 
 <style scoped lang="scss">
-  .c-1 {
-    width: 100%;
+  .chat {
+    position: relative;
+    .c-1 {
+      box-sizing: border-box;
+      padding: 0 20px 0 20px;
+      height: 500px;
+      overflow-y: scroll;
+      background-color: deepskyblue;
+      .a {
+        box-sizing: border-box;
+        padding: 5px;
+        overflow: hidden;
+        div {
+          box-sizing: border-box;
+          padding: 5px;
+          border-radius: 4px;
+          float: right;
+          background-color: #07c160;
+        }
+      }
+      .b {
+        box-sizing: border-box;
+        padding: 5px;
+        overflow: hidden;
+        div {
+          box-sizing: border-box;
+          padding: 5px;
+          border-radius: 4px;
+          float: left;
+          background-color: #f7f7f7;
+        }
+      }
+    }
+    .c-2 {
+      width: 100%;
+    }
   }
- footer {
-   width: 100%;
- }
 </style>

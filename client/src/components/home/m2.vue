@@ -1,12 +1,5 @@
 <template>
   <div class="m2">
-    <header>
-      <van-cell title="微聊" :border="false" center>
-        <template #right-icon>
-          <van-icon name="add-o" @click="to" />
-        </template>
-      </van-cell>
-    </header>
     <van-cell v-for="(i, index) in list" :key="index" @click="toChat(i)">
       <div class="item">
         <img src="../../assets/logo.png"/>
@@ -39,9 +32,6 @@
       })
     },
     methods: {
-      to() {
-        this.$router.push('/m3')
-      },
       toChat(e) {
         this.$router.push({
           path: '/chat',
@@ -56,11 +46,8 @@
 
 <style scoped lang="scss">
   .m2 {
-    header {
-      .van-cell {
-        background-color: #fff;
-      }
-    }
+    height: 500px;
+    overflow-y: scroll;
     .van-cell {
       background-color: #f7f7f7;
 

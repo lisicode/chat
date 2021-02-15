@@ -1,5 +1,14 @@
 <template>
   <div class="home">
+    <header>
+      <van-cell title="微聊" :border="false" center>
+        <template #right-icon>
+          <router-link to="/m3">
+            <van-icon name="add-o" />
+          </router-link>
+        </template>
+      </van-cell>
+    </header>
     <router-view></router-view>
     <van-tabbar v-model="active" route>
       <van-tabbar-item icon="chat-o" to="/home">聊天</van-tabbar-item>
