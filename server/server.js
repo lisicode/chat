@@ -216,6 +216,10 @@ let ws = new WebSocket.Server({port: 8081}, () => {
             if (allUserData[s].id === data.toId) {
               // allUserData[s].ws.send('已接收来自' + data.id + '的' + data.msg)
               allUserData[s].ws.send(data.msg)
+            } else {
+              console.log(data.id)
+              console.log(data.toId)
+              console.log(data.msg)
             }
           }
           break;
