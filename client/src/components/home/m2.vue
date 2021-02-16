@@ -46,11 +46,8 @@
 
 <style scoped lang="scss">
   .m2 {
-    height: 500px;
-    overflow-y: scroll;
     .van-cell {
       background-color: #f7f7f7;
-
       .item {
         display: flex;
         justify-content: left;

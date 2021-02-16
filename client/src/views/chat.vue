@@ -1,14 +1,20 @@
 <template>
   <div class="chat">
-    <van-nav-bar :title="this.$route.query.account" left-arrow />
     <div class="c-1">
+      <van-nav-bar
+              :title="this.$route.query.account"
+              left-arrow
+              @click-left="back"
+      />
+    </div>
+    <div class="c-2" id="chatContainer" :style="{ height: this.windowHeight - 99 + 'px' }">
       <div v-for="i in mq" :class="i.class">
         <div>
           {{ i.msg }}
         </div>
       </div>
     </div>
-    <div class="c-2">
+    <div class="c-3">
       <van-form @submit="OnSend">
         <van-field
                 v-model="msg"
@@ -33,8 +39,17 @@ export default {
   data() {
     return {
       msg: '',
-      mq: []
+      mq: [],
+      windowHeight: document.documentElement.clientHeight
     };
+  },
+  watch: {
+    mq() {
+      this.$nextTick(() => {
+        let list = this.$el.querySelector("#chatContainer");
+        list.scrollTop = list.scrollHeight
+      })
+    }
   },
   created() {
     this.InitWebSocket();
@@ -63,11 +78,7 @@ export default {
     OnClose(e) {
       console.log('断开连接', e);
     },
-
-
-
     OnMessage(e) {
-      console.log(e)
       this.mq.push({
         class: 'b',
         msg: e.data
@@ -86,21 +97,22 @@ export default {
       });
       this.websock.send(JSON.stringify(data));
     },
-
-
+    back() {
+      this.$router.push('/m2')
+    },
   }
 }
 </script>
 
 <style scoped lang="scss">
   .chat {
-    position: relative;
     .c-1 {
+
+    }
+    .c-2 {
       box-sizing: border-box;
       padding: 0 20px 0 20px;
-      height: 500px;
       overflow-y: scroll;
-      background-color: deepskyblue;
       .a {
         box-sizing: border-box;
         padding: 5px;
@@ -126,8 +138,8 @@ export default {
         }
       }
     }
-    .c-2 {
-      width: 100%;
+    .c-3 {
+
     }
   }
 </style>
