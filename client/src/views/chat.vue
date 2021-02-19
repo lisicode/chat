@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import {ApiConfig, Request, GetLocalStorage} from "@/assets/js/config";
+import {ApiConfig, Request, GetLocalStorage, Socket} from "@/assets/js/config";
 export default {
   name: 'chat',
   data() {
@@ -54,29 +54,9 @@ export default {
   created() {
     this.InitWebSocket();
   },
-  destroyed() {
-    this.websock.close()
-  },
   methods: {
     InitWebSocket() {
-      this.websock = new WebSocket('ws://127.0.0.1:8081/');
-      this.websock.onmessage = this.OnMessage;
-      this.websock.onopen = this.OnOpen;
-      this.websock.onerror = this.OnError;
-      this.websock.onclose = this.OnClose;
-    },
-    OnOpen() {
-      let data = {
-        type: 'login',
-        id: GetLocalStorage('userData').account
-      };
-      this.websock.send(JSON.stringify(data));
-    },
-    OnError() {
-      this.InitWebSocket();
-    },
-    OnClose(e) {
-      console.log('断开连接', e);
+      Socket.onmessage = this.OnMessage;
     },
     OnMessage(e) {
       this.mq.push({
@@ -95,7 +75,7 @@ export default {
         class: 'a',
         msg: this.msg
       });
-      this.websock.send(JSON.stringify(data));
+      Socket.send(JSON.stringify(data));
     },
     back() {
       this.$router.push('/m2')
