@@ -50,6 +50,4 @@ Request.interceptors.response.use(response => {
   console.log(error)
 });
 
-const Socket = new WebSocket('ws://localhost:8081')
-
-export {ApiConfig, Request, SetLocalStorage, GetLocalStorage, Socket}
+export {ApiConfig, Request, SetLocalStorage, GetLocalStorage}

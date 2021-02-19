@@ -33,55 +33,75 @@
 </template>
 
 <script>
-import {ApiConfig, Request, GetLocalStorage, Socket} from "@/assets/js/config";
-export default {
-  name: 'chat',
-  data() {
-    return {
-      msg: '',
-      mq: [],
-      windowHeight: document.documentElement.clientHeight
-    };
-  },
-  watch: {
-    mq() {
-      this.$nextTick(() => {
-        let list = this.$el.querySelector("#chatContainer");
-        list.scrollTop = list.scrollHeight
-      })
-    }
-  },
-  created() {
-    this.InitWebSocket();
-  },
-  methods: {
-    InitWebSocket() {
-      Socket.onmessage = this.OnMessage;
-    },
-    OnMessage(e) {
-      this.mq.push({
-        class: 'b',
-        msg: e.data
-      });
-    },
-    OnSend() {
-      let data = {
-        type: 'send',
-        id: GetLocalStorage('userData').account,
-        toId: this.$route.query.account,
-        msg: this.msg
+  import {ApiConfig, Request, GetLocalStorage} from "@/assets/js/config";
+  export default {
+    name: 'chat',
+    data() {
+      return {
+        msg: '',
+        mq: [],
+        windowHeight: document.documentElement.clientHeight
       };
-      this.mq.push({
-        class: 'a',
-        msg: this.msg
-      });
-      Socket.send(JSON.stringify(data));
     },
-    back() {
-      this.$router.push('/m2')
+    watch: {
+      mq() {
+        this.$nextTick(() => {
+          let list = this.$el.querySelector("#chatContainer");
+          list.scrollTop = list.scrollHeight
+        })
+      }
     },
+    created() {
+      this.InitWebSocket();
+    },
+    destroyed() {
+      this.websock.close()
+    },
+    methods: {
+      InitWebSocket() {
+        this.websock = new WebSocket('ws://127.0.0.1:8081/');
+        this.websock.onmessage = this.OnMessage;
+        this.websock.onopen = this.OnOpen;
+        this.websock.onerror = this.OnError;
+        this.websock.onclose = this.OnClose;
+      },
+      OnOpen() {
+        let data = {
+          type: 'login',
+          id: GetLocalStorage('userData').account
+        };
+        this.websock.send(JSON.stringify(data));
+      },
+      OnError() {
+        this.InitWebSocket();
+      },
+      OnClose(e) {
+        console.log('断开连接', e);
+      },
+      OnMessage(e) {
+        this.mq.push({
+          class: 'b',
+          msg: e.data
+        });
+      },
+      OnSend() {
+        let data = {
+          type: 'send',
+          id: GetLocalStorage('userData').account,
+          toId: this.$route.query.account,
+          msg: this.msg
+        };
+        this.mq.push({
+          class: 'a',
+          msg: this.msg
+        });
+        this.websock.send(JSON.stringify(data));
+      },
+      back() {
+        this.$router.push('/m2')
+      },
+    }
   }
-}
 </script>
 
 <style scoped lang="scss">

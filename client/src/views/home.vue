@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import {GetLocalStorage, Socket} from "@/assets/js/config";
+import {GetLocalStorage} from "@/assets/js/config";
 
 export default {
   name: 'home',
@@ -32,28 +32,29 @@ export default {
   created() {
     this.InitWebSocket();
   },
-  destroyed() {
-    // Socket.close()
-  },
   methods: {
     InitWebSocket() {
-      Socket.onmessage = this.OnMessage;
-      Socket.onopen = this.OnOpen;
-      Socket.onerror = this.OnError;
-      Socket.onclose = this.OnClose;
+      this.websock = new WebSocket('ws://127.0.0.1:8081/');
+      this.websock.onmessage = this.OnMessage;
+      this.websock.onopen = this.OnOpen;
+      this.websock.onerror = this.OnError;
+      this.websock.onclose = this.OnClose;
     },
     OnOpen() {
       let data = {
         type: 'login',
         id: GetLocalStorage('userData').account
       };
-      Socket.send(JSON.stringify(data));
+      this.websock.send(JSON.stringify(data));
     },
     OnError() {
       this.InitWebSocket();
     },
     OnClose(e) {
       console.log('断开连接', e);
+    },
+    OnMessage(e) {
+      console.log(e)
     },
   }
 }
