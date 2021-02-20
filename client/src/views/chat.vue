@@ -59,7 +59,7 @@
     },
     methods: {
       InitWebSocket() {
-        this.websock = new WebSocket('ws://127.0.0.1:8081/');
+        this.websock = new WebSocket('ws://localhost:8081/');
         this.websock.onmessage = this.OnMessage;
         this.websock.onopen = this.OnOpen;
         this.websock.onerror = this.OnError;
