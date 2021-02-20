@@ -44,7 +44,9 @@
       };
     },
     watch: {
-      mq() {
+      mq(val) {
+        console.log(val)
+
         this.$nextTick(() => {
           let list = this.$el.querySelector("#chatContainer");
           list.scrollTop = list.scrollHeight
@@ -79,10 +81,8 @@
         console.log('断开连接', e);
       },
       OnMessage(e) {
-        this.mq.push({
-          class: 'b',
-          msg: e.data
-        });
+        let data = JSON.parse(e.data);
+        this.mq.push(data);
       },
       OnSend() {
         let data = {
@@ -91,10 +91,7 @@
           toId: this.$route.query.account,
           msg: this.msg
         };
-        this.mq.push({
-          class: 'a',
-          msg: this.msg
-        });
+        this.mq.push(data);
         this.websock.send(JSON.stringify(data));
       },
       back() {
