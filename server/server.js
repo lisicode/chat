@@ -32,7 +32,7 @@ http.createServer((req, res) => {
     switch (data.api) {
       case 'A001':
         let querySignInAccount = `SELECT * FROM user WHERE account LIKE ${data.signInData.account}`;
-        let signInAccount = `INSERT INTO user(account, password, friends, message) VALUES ('${data.signInData.account}', '${md5(data.signInData.password)}', '[]', '[]')`;
+        let signInAccount = `INSERT INTO user(account, password, friends) VALUES ('${data.signInData.account}', '${md5(data.signInData.password)}', '[]')`;
         connection().query(querySignInAccount, (err, result) => {
           if (err) {
             console.log('[SELECT ERROR] - ', err.message);
@@ -188,9 +188,29 @@ http.createServer((req, res) => {
             }
           }
         });
-        break
+        break;
       case "A005":
-
+        let getMessageRecords = `SELECT * FROM message WHERE toId LIKE ${data.account}`;
+        connection().query(getMessageRecords, (err, result) => {
+          if (err) {
+            console.log('[SELECT ERROR] - ', err.message);
+            return false;
+          } else {
+            if (result.length) {
+              let sendData = {
+                status: '0000',
+                messageRecordsList: result
+              };
+              res.end(JSON.stringify(sendData));
+            } else {
+              let sendData = {
+                status: '0001',
+                msg: '暂无消息'
+              };
+              res.end(JSON.stringify(sendData));
+            }
+          }
+        });
         break;
     }
   });
@@ -212,14 +232,23 @@ let ws = new WebSocket.Server({port: 8081}, () => {
             id: data.id,
             ws: client
           });
-          console.log('连接成功' + '当前' + allUserData.length + '个用户在线');
+          // console.log('连接成功' + '当前' + allUserData.length + '个用户在线');
           break;
         case 'send':
           allUserData.some((item, i) => {
             if (item.id === data.toId) {
-              allUserData[i].ws.send(JSON.stringify(data))
+              allUserData[i].ws.send(JSON.stringify(data));
             }
-          })
+          });
+          let message = `INSERT INTO message(id, toId, msg) VALUES ('${data.id}', '${data.toId}', '${data.msg}')`;
+          connection().query(message, (err, result) => {
+            if (err) {
+              console.log('[SELECT ERROR] - ', err.message);
+              return false;
+            } else {
+              console.log(result)
+            }
+          });
           break;
       }
     });
