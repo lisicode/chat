@@ -32,7 +32,7 @@ http.createServer((req, res) => {
     switch (data.api) {
       case 'A001':
         let querySignInAccount = `SELECT * FROM user WHERE account LIKE ${data.signInData.account}`;
-        let signInAccount = `INSERT INTO user(account, password, friends) VALUES ('${data.signInData.account}', '${md5(data.signInData.password)}', '[]')`;
+        let signInAccount = `INSERT INTO user(account, password, friends, message) VALUES ('${data.signInData.account}', '${md5(data.signInData.password)}', '[]', '[]')`;
         connection().query(querySignInAccount, (err, result) => {
           if (err) {
             console.log('[SELECT ERROR] - ', err.message);
@@ -189,6 +189,9 @@ http.createServer((req, res) => {
           }
         });
         break
+      case "A005":
+
+        break;
     }
   });
 }).listen(8080);
@@ -212,16 +215,11 @@ let ws = new WebSocket.Server({port: 8081}, () => {
           console.log('连接成功' + '当前' + allUserData.length + '个用户在线');
           break;
         case 'send':
-          for (let s in allUserData) {
-            if (allUserData[s].id === data.toId) {
-              // allUserData[s].ws.send('已接收来自' + data.id + '的' + data.msg)
-              allUserData[s].ws.send(JSON.stringify(data))
-            } else {
-              console.log(data.id)
-              console.log(data.toId)
-              console.log(data.msg)
+          allUserData.some((item, i) => {
+            if (item.id === data.toId) {
+              allUserData[i].ws.send(JSON.stringify(data))
             }
-          }
+          })
           break;
       }
     });
