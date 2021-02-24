@@ -8,7 +8,7 @@
       />
     </div>
     <div class="c-2" id="chatContainer" :style="{ height: this.windowHeight - 99 + 'px' }">
-      <div v-for="i in mq" :class="i.class">
+      <div v-for="i in mq" :class="i.id === id ? 'a' : 'b' ">
         <div>
           {{ i.msg }}
         </div>
@@ -40,13 +40,12 @@
       return {
         msg: '',
         mq: [],
+        id: GetLocalStorage('userData').account,
         windowHeight: document.documentElement.clientHeight
       };
     },
     watch: {
-      mq(val) {
-        console.log(val)
-
+      mq() {
         this.$nextTick(() => {
           let list = this.$el.querySelector("#chatContainer");
           list.scrollTop = list.scrollHeight
@@ -70,7 +69,7 @@
       OnOpen() {
         let data = {
           type: 'login',
-          id: GetLocalStorage('userData').account
+          id: this.id
         };
         this.websock.send(JSON.stringify(data));
       },
@@ -82,12 +81,18 @@
       },
       OnMessage(e) {
         let data = JSON.parse(e.data);
-        this.mq.push(data);
+        if (this.$route.query.account != data.toId) {
+          if (this.$route.query.account === data.id) {
+            this.mq.push(data);
+          } else {
+            console.log('他人消息已接收')
+          }
+        }
       },
       OnSend() {
         let data = {
           type: 'send',
-          id: GetLocalStorage('userData').account,
+          id: this.id,
           toId: this.$route.query.account,
           msg: this.msg
         };

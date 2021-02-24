@@ -5,8 +5,21 @@
 </template>
 
 <script>
+import {ApiConfig, GetLocalStorage, Request} from "@/assets/js/config";
+
 export default {
   name: 'm1',
+  data() {
+    return {
+
+    };
+  },
+  created() {
+
+  },
+  methods: {
+
+  }
 }
 </script>
 
