@@ -54,21 +54,26 @@
     },
     created() {
       this.InitWebSocket();
+
       Request({
         method: 'post',
         data: {
-          api: ApiConfig.createRoom,
-          toId: this.$route.query.account,
+          api: ApiConfig.queryMessageList,
           id: GetLocalStorage('userData').account,
+          toId: this.$route.query.account
         }
       }).then(res => {
         console.log(res)
       })
+
     },
     destroyed() {
       this.websock.close()
     },
     methods: {
+      back() {
+        this.$router.push('/m2')
+      },
       InitWebSocket() {
         this.websock = new WebSocket('ws://localhost:8081/');
         this.websock.onmessage = this.OnMessage;
@@ -108,10 +113,7 @@
         };
         this.mq.push(data);
         this.websock.send(JSON.stringify(data));
-      },
-      back() {
-        this.$router.push('/m2')
-      },
+      }
     }
   }
 </script>

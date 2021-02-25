@@ -25,6 +25,8 @@ const connection = () => {
   return config
 };
 
+let arr = [];
+
 http.createServer((req, res) => {
   res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
   req.on('data', (e) => {
@@ -190,30 +192,78 @@ http.createServer((req, res) => {
         });
         break;
       case "A005":
-        let queryRoom = `SELECT * FROM user WHERE account LIKE ${data.toId}`;
-        connection().query(queryRoom, (err, result) => {
+
+        let queryMessageList = `SELECT * FROM user WHERE account LIKE ${data.id}`;
+        connection().query(queryMessageList, (err, result) => {
           if (err) {
             console.log('[SELECT ERROR] - ', err.message);
             return false;
           } else {
-            if (JSON.parse(result[0].room).length) {
-              console.log(1)
-            } else {
-              console.log(2)
-              let createRoom = `INSERT INTO message(message) VALUES ('[]')`;
-              connection().query(createRoom, (err, result) => {
+            if (result[0].roomId) {
+              console.log(result[0].roomId)
+              let aa = JSON.parse(result[0].roomId)
+
+              let c = `SELECT * FROM user WHERE account LIKE ${data.toId}`;
+              connection().query(c, (err, result) => {
                 if (err) {
                   console.log('[SELECT ERROR] - ', err.message);
                   return false;
                 } else {
-                  console.log(result)
+                  if (result[0].roomId) {
+
+                    console.log(result[0].roomId)
+                    let bb = JSON.parse(result[0].roomId)
+                    let cc = aa.concat(bb);
+                    function refrain(arr) {
+                      let tmp = [];
+                      if(Array.isArray(arr)) {
+                        arr.concat().sort().sort(function(a,b) {
+                          if(a==b && tmp.indexOf(a) === -1) tmp.push(a);
+                        });
+                      }
+                      return tmp;
+                    }
+                    console.log(refrain(cc)[0])
+
+
+                  } else {
+
+                  }
+                }
+                });
+
+            } else {
+              let a = `INSERT INTO message(message) VALUES ('[]')`;
+              connection().query(a, (err, result) => {
+                if (err) {
+                  console.log('[SELECT ERROR] - ', err.message);
+                  return false;
+                } else {
+                  let id = result.insertId;
+                  arr.push(id);
+                  let b = `UPDATE user SET roomId = '${JSON.stringify(arr)}' WHERE account = ${data.id} OR account = ${data.toId}`;
+                  connection().query(b, (err, result) => {
+                    if (err) {
+                      console.log('[SELECT ERROR] - ', err.message);
+                      return false;
+                    } else {
+                      console.log(result)
+                    }
+                  });
+
+
+
 
                 }
-              })
+              });
+
+
             }
 
           }
         });
+
+
         break;
     }
   });
@@ -235,7 +285,6 @@ let ws = new WebSocket.Server({port: 8081}, () => {
             id: data.id,
             ws: client
           });
-          // console.log('连接成功' + '当前' + allUserData.length + '个用户在线');
           break;
         case 'send':
           allUserData.some((item, i) => {
@@ -243,18 +292,6 @@ let ws = new WebSocket.Server({port: 8081}, () => {
               allUserData[i].ws.send(JSON.stringify(data));
             }
           });
-
-
-          let message = `INSERT INTO message(id, toId, message) VALUES ('${data.id}', '${data.toId}', '${JSON.stringify(data)}')`;
-          connection().query(message, (err, result) => {
-            if (err) {
-              console.log('[SELECT ERROR] - ', err.message);
-              return false;
-            } else {
-              console.log(result)
-            }
-          });
-
 
           break;
       }

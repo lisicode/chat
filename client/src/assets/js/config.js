@@ -16,7 +16,7 @@ const ApiConfig = {
   queryFriends: 'A002',
   addFriends: 'A003',
   getFriends: 'A004',
-  createRoom: 'A005'
+  queryMessageList: 'A005'
 };
 
 // 环境定义
