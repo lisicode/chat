@@ -1,7 +1,7 @@
 <template>
   <div class="m1">
-    <van-cell v-for="(i, index) in list" :key="index" :title="i.id" :label="i.msg" />
-<!--    <van-empty description="暂无消息" />-->
+    <van-cell v-for="(i, index) in list" :key="index" :title="i.id" :label="i.message" />
+<!--    <van-empty v-if="list.length === 0" description="暂无消息" />-->
   </div>
 </template>
 
@@ -12,8 +12,7 @@ export default {
   name: 'm1',
   data() {
     return {
-      list: []
-
+      list: [],
     };
   },
   created() {
@@ -24,10 +23,7 @@ export default {
         account: GetLocalStorage('userData').account
       }
     }).then(res => {
-      const result = Array.from(res.messageRecordsList.reduce((m, t) => m.set(t.id, t), new Map()).values());
-      console.log(result)
-
-      this.list = result;
+      console.log(res)
     })
   },
   methods: {

@@ -54,6 +54,16 @@
     },
     created() {
       this.InitWebSocket();
+      Request({
+        method: 'post',
+        data: {
+          api: ApiConfig.createRoom,
+          toId: this.$route.query.account,
+          id: GetLocalStorage('userData').account,
+        }
+      }).then(res => {
+        console.log(res)
+      })
     },
     destroyed() {
       this.websock.close()
