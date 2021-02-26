@@ -279,6 +279,9 @@ http.createServer((req, res) => {
           }
         });
         break;
+      case "A006":
+        console.log(data)
+        break;
     }
   });
 }).listen(8080);

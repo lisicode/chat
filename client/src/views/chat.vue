@@ -54,6 +54,7 @@
       }
     },
     created() {
+      // 初始化websocket
       this.InitWebSocket();
 
       // 查询或创建信息池id
@@ -70,6 +71,20 @@
       })
     },
     destroyed() {
+      // 存储聊天记录
+      Request({
+        method: 'post',
+        data: {
+          api: ApiConfig.storedRecord,
+          roomId: this.roomId,
+          mq: this.mq
+        }
+      }).then(res => {
+        console.log(res)
+        this.roomId = res.roomId;
+      })
+
+      // 退出的断开websocket
       this.websock.close()
     },
     methods: {

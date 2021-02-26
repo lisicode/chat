@@ -17,7 +17,7 @@
           :rules="[{ required: true }]"
       />
       <div style="margin: 16px;">
-        <van-button block type="info" native-type="submit">提交</van-button>
+        <van-button block type="info" native-type="submit">登录</van-button>
       </div>
     </van-form>
   </div>

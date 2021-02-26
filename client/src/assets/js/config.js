@@ -16,7 +16,8 @@ const ApiConfig = {
   queryFriends: 'A002',
   addFriends: 'A003',
   getFriends: 'A004',
-  queryRoomId: 'A005'
+  queryRoomId: 'A005',
+  storedRecord: 'A006'
 };
 
 // 环境定义
