@@ -40,6 +40,7 @@
       return {
         msg: '',
         mq: [],
+        roomId: '',
         id: GetLocalStorage('userData').account,
         windowHeight: document.documentElement.clientHeight
       };
@@ -55,17 +56,18 @@
     created() {
       this.InitWebSocket();
 
+      // 查询或创建信息池id
       Request({
         method: 'post',
         data: {
-          api: ApiConfig.queryMessageList,
+          api: ApiConfig.queryRoomId,
           id: GetLocalStorage('userData').account,
           toId: this.$route.query.account
         }
       }).then(res => {
         console.log(res)
+        this.roomId = res.roomId;
       })
-
     },
     destroyed() {
       this.websock.close()

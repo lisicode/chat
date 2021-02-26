@@ -25,8 +25,6 @@ const connection = () => {
   return config
 };
 
-let arr = [];
-
 http.createServer((req, res) => {
   res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
   req.on('data', (e) => {
@@ -34,7 +32,7 @@ http.createServer((req, res) => {
     switch (data.api) {
       case 'A001':
         let querySignInAccount = `SELECT * FROM user WHERE account LIKE ${data.signInData.account}`;
-        let signInAccount = `INSERT INTO user(account, password, friends) VALUES ('${data.signInData.account}', '${md5(data.signInData.password)}', '[]')`;
+        let signInAccount = `INSERT INTO user(account, password, friends, room) VALUES ('${data.signInData.account}', '${md5(data.signInData.password)}', '[]', '[]')`;
         connection().query(querySignInAccount, (err, result) => {
           if (err) {
             console.log('[SELECT ERROR] - ', err.message);
@@ -192,78 +190,94 @@ http.createServer((req, res) => {
         });
         break;
       case "A005":
-
-        let queryMessageList = `SELECT * FROM user WHERE account LIKE ${data.id}`;
-        connection().query(queryMessageList, (err, result) => {
+        // 匹配信息池
+        let matchingRoomId = `SELECT * FROM user WHERE account LIKE ${data.id} OR account LIKE ${data.toId}`;
+        connection().query(matchingRoomId, (err, result) => {
           if (err) {
             console.log('[SELECT ERROR] - ', err.message);
             return false;
           } else {
-            if (result[0].roomId) {
-              console.log(result[0].roomId)
-              let aa = JSON.parse(result[0].roomId)
-
-              let c = `SELECT * FROM user WHERE account LIKE ${data.toId}`;
-              connection().query(c, (err, result) => {
-                if (err) {
-                  console.log('[SELECT ERROR] - ', err.message);
-                  return false;
-                } else {
-                  if (result[0].roomId) {
-
-                    console.log(result[0].roomId)
-                    let bb = JSON.parse(result[0].roomId)
-                    let cc = aa.concat(bb);
-                    function refrain(arr) {
-                      let tmp = [];
-                      if(Array.isArray(arr)) {
-                        arr.concat().sort().sort(function(a,b) {
-                          if(a==b && tmp.indexOf(a) === -1) tmp.push(a);
-                        });
-                      }
-                      return tmp;
-                    }
-                    console.log(refrain(cc)[0])
-
-
-                  } else {
-
-                  }
-                }
+            // 合并信息池id
+            let a = JSON.parse(result[0].room);
+            let b = JSON.parse(result[1].room);
+            let c = a.concat(b);
+            // 查找信息池id
+            let matching = (arr) => {
+              let tmp = [];
+              if (Array.isArray(arr)) {
+                arr.concat().sort().sort((a, b) => {
+                  if (a === b && tmp.indexOf(a) === -1) tmp.push(a);
                 });
-
-            } else {
-              let a = `INSERT INTO message(message) VALUES ('[]')`;
-              connection().query(a, (err, result) => {
+              }
+              return tmp;
+            }
+            // 信息池id不存在
+            if (matching(c).length === 0) {
+              // 创建信息池id
+              let createRoom = `INSERT INTO message(message) VALUES ('[]')`;
+              connection().query(createRoom, (err, result) => {
                 if (err) {
                   console.log('[SELECT ERROR] - ', err.message);
                   return false;
                 } else {
-                  let id = result.insertId;
-                  arr.push(id);
-                  let b = `UPDATE user SET roomId = '${JSON.stringify(arr)}' WHERE account = ${data.id} OR account = ${data.toId}`;
-                  connection().query(b, (err, result) => {
+                  // 信息池id
+                  let roomId = result.insertId;
+                  // 添加发送方信息池id
+                  let queryRoomId = `SELECT * FROM user WHERE account LIKE ${data.id}`
+                  connection().query(queryRoomId, (err, result) => {
                     if (err) {
                       console.log('[SELECT ERROR] - ', err.message);
                       return false;
                     } else {
-                      console.log(result)
+                      let arr = JSON.parse(result[0].room)
+                      arr.push(roomId)
+                      let addRoomId = `UPDATE user SET room = '${JSON.stringify(arr)}' WHERE account = ${data.id}`;
+                      connection().query(addRoomId, (err, result) => {
+                        if (err) {
+                          console.log('[SELECT ERROR] - ', err.message);
+                          return false;
+                        } else {
+                          // 添加接收方信息池id
+                          let queryRoomId = `SELECT * FROM user WHERE account LIKE ${data.toId}`
+                          connection().query(queryRoomId, (err, result) => {
+                            if (err) {
+                              console.log('[SELECT ERROR] - ', err.message);
+                              return false;
+                            } else {
+                              let arr = JSON.parse(result[0].room)
+                              arr.push(roomId)
+                              let addRoomId = `UPDATE user SET room = '${JSON.stringify(arr)}' WHERE account = ${data.toId}`;
+                              connection().query(addRoomId, (err, result) => {
+                                if (err) {
+                                  console.log('[SELECT ERROR] - ', err.message);
+                                  return false;
+                                } else {
+                                  // 返回信息池id
+                                  let sendData = {
+                                    status: '0000',
+                                    roomId: roomId,
+                                  };
+                                  res.end(JSON.stringify(sendData));
+                                }
+                              })
+                            }
+                          });
+                        }
+                      })
                     }
-                  });
-
-
-
-
+                  })
                 }
-              });
-
-
+              })
+            } else {
+              // 返回信息池id
+              let sendData = {
+                status: '0000',
+                roomId: matching(c)[0],
+              };
+              res.end(JSON.stringify(sendData));
             }
-
           }
         });
-
-
         break;
     }
   });
@@ -292,7 +306,6 @@ let ws = new WebSocket.Server({port: 8081}, () => {
               allUserData[i].ws.send(JSON.stringify(data));
             }
           });
-
           break;
       }
     });
