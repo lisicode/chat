@@ -210,7 +210,7 @@ http.createServer((req, res) => {
                 });
               }
               return tmp;
-            }
+            };
             // 信息池id不存在
             if (matching(c).length === 0) {
               // 创建信息池id
@@ -223,14 +223,14 @@ http.createServer((req, res) => {
                   // 信息池id
                   let roomId = result.insertId;
                   // 添加发送方信息池id
-                  let queryRoomId = `SELECT * FROM user WHERE account LIKE ${data.id}`
+                  let queryRoomId = `SELECT * FROM user WHERE account LIKE ${data.id}`;
                   connection().query(queryRoomId, (err, result) => {
                     if (err) {
                       console.log('[SELECT ERROR] - ', err.message);
                       return false;
                     } else {
-                      let arr = JSON.parse(result[0].room)
-                      arr.push(roomId)
+                      let arr = JSON.parse(result[0].room);
+                      arr.push(roomId);
                       let addRoomId = `UPDATE user SET room = '${JSON.stringify(arr)}' WHERE account = ${data.id}`;
                       connection().query(addRoomId, (err, result) => {
                         if (err) {
@@ -238,14 +238,14 @@ http.createServer((req, res) => {
                           return false;
                         } else {
                           // 添加接收方信息池id
-                          let queryRoomId = `SELECT * FROM user WHERE account LIKE ${data.toId}`
+                          let queryRoomId = `SELECT * FROM user WHERE account LIKE ${data.toId}`;
                           connection().query(queryRoomId, (err, result) => {
                             if (err) {
                               console.log('[SELECT ERROR] - ', err.message);
                               return false;
                             } else {
-                              let arr = JSON.parse(result[0].room)
-                              arr.push(roomId)
+                              let arr = JSON.parse(result[0].room);
+                              arr.push(roomId);
                               let addRoomId = `UPDATE user SET room = '${JSON.stringify(arr)}' WHERE account = ${data.toId}`;
                               connection().query(addRoomId, (err, result) => {
                                 if (err) {
@@ -280,8 +280,34 @@ http.createServer((req, res) => {
         });
         break;
       case "A006":
-        console.log(data)
+        let storedMessageRecord = `UPDATE message SET message = '${JSON.stringify(data.mq)}' WHERE id = ${data.roomId}`;
+        connection().query(storedMessageRecord, (err, result) => {
+          if (err) {
+            console.log('[SELECT ERROR] - ', err.message);
+            return false;
+          } else {
+            let sendData = {
+              status: '0000',
+            };
+            res.end(JSON.stringify(sendData));
+          }
+        });
         break;
+      case "A007":
+        let getMessageRecord = `SELECT * FROM message WHERE id LIKE ${data.roomId}`;
+        connection().query(getMessageRecord, (err, result) => {
+          if (err) {
+            console.log('[SELECT ERROR] - ', err.message);
+            return false;
+          } else {
+            let sendData = {
+              status: '0000',
+              mq: result[0].message
+            };
+            res.end(JSON.stringify(sendData));
+          }
+        });
+        break
     }
   });
 }).listen(8080);

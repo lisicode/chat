@@ -53,20 +53,25 @@ export default {
       })
     },
     add() {
-      Request({
-        method: 'post',
-        data: {
-          api: ApiConfig.addFriends,
-          account: GetLocalStorage('userData').account,
-          friendsData: this.friendsData
-        }
-      }).then(res => {
-        if (res.status === '0000') {
-          this.$notify({ type: 'success', message: res.msg });
-        } else if (res.status === '0001') {
-          this.$notify({ type: 'danger', message: res.msg });
-        }
-      })
+      if (this.friendsData === GetLocalStorage('userData').account) {
+        this.$notify({ type: 'danger', message: '您不能添加自己为好友' });
+      } else {
+        Request({
+          method: 'post',
+          data: {
+            api: ApiConfig.addFriends,
+            account: GetLocalStorage('userData').account,
+            friendsData: this.friendsData
+          }
+        }).then(res => {
+          if (res.status === '0000') {
+            this.$notify({ type: 'success', message: res.msg });
+            this.$router.push('/m2')
+          } else if (res.status === '0001') {
+            this.$notify({ type: 'danger', message: res.msg });
+          }
+        })
+      }
     }
   }
 }

@@ -47,6 +47,18 @@
     },
     watch: {
       mq() {
+        // 存储聊天记录
+        Request({
+          method: 'post',
+          data: {
+            api: ApiConfig.storedMessageRecord,
+            roomId: this.roomId,
+            mq: this.mq
+          }
+        }).then(res => {
+        });
+
+        // 动态调整聊天框体
         this.$nextTick(() => {
           let list = this.$el.querySelector("#chatContainer");
           list.scrollTop = list.scrollHeight
@@ -66,24 +78,22 @@
           toId: this.$route.query.account
         }
       }).then(res => {
-        console.log(res)
+        // 获取信息池id
         this.roomId = res.roomId;
+        // 加载信息池
+        Request({
+          method: 'post',
+          data: {
+            api: ApiConfig.getMessageRecord,
+            roomId: res.roomId
+          }
+        }).then(res => {
+          this.mq = JSON.parse(res.mq)
+        })
+
       })
     },
     destroyed() {
-      // 存储聊天记录
-      Request({
-        method: 'post',
-        data: {
-          api: ApiConfig.storedRecord,
-          roomId: this.roomId,
-          mq: this.mq
-        }
-      }).then(res => {
-        console.log(res)
-        this.roomId = res.roomId;
-      })
-
       // 退出的断开websocket
       this.websock.close()
     },
@@ -108,16 +118,13 @@
       OnError() {
         this.InitWebSocket();
       },
-      OnClose(e) {
-        console.log('断开连接', e);
-      },
       OnMessage(e) {
         let data = JSON.parse(e.data);
         if (this.$route.query.account != data.toId) {
           if (this.$route.query.account === data.id) {
             this.mq.push(data);
           } else {
-            console.log('他人消息已接收')
+            this.$notify({ type: 'success', message: '您有一条新消息'});
           }
         }
       },
@@ -130,6 +137,7 @@
         };
         this.mq.push(data);
         this.websock.send(JSON.stringify(data));
+        this.msg = '';
       }
     }
   }
