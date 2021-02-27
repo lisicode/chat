@@ -7,7 +7,7 @@
               @click-left="back"
       />
     </div>
-    <div class="c-2" id="chatContainer" :style="{ height: this.windowHeight - 99 + 'px' }">
+    <div class="c-2" id="chatContainer" :style="{ height: this.windowHeight - 100 + 'px' }">
       <div v-for="i in mq" :class="i.id === id ? 'a' : 'b' ">
         <div>
           {{ i.msg }}
@@ -24,7 +24,9 @@
                 :rules="[{ required: true }]"
         >
           <template #button>
-            <van-button size="small" type="primary" native-type="submit">发送</van-button>
+            <van-uploader :after-read="afterRead">
+              <van-button size="small" icon="photo-o" type="default" plain />
+            </van-uploader>
           </template>
         </van-field>
       </van-form>
@@ -138,7 +140,11 @@
         this.mq.push(data);
         this.websock.send(JSON.stringify(data));
         this.msg = '';
-      }
+      },
+
+      afterRead(file) {
+        console.log(file);
+      },
     }
   }
 </script>
@@ -178,7 +184,8 @@
       }
     }
     .c-3 {
-
+      box-sizing: border-box;
+      border-top: 1px solid #ebedf0;
     }
   }
 </style>
