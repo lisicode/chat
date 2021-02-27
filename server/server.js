@@ -8,7 +8,8 @@ const connection = () => {
     host: 'localhost',
     user: 'lisi',
     password: '123456',
-    database: 'chat'
+    database: 'chat',
+    multipleStatements: true
   });
   config.connect((err) => {
     if (err) {
@@ -189,7 +190,7 @@ http.createServer((req, res) => {
           }
         });
         break;
-      case "A005":
+      case 'A005':
         // 匹配信息池
         let matchingRoomId = `SELECT * FROM user WHERE account LIKE ${data.id} OR account LIKE ${data.toId}`;
         connection().query(matchingRoomId, (err, result) => {
@@ -279,7 +280,7 @@ http.createServer((req, res) => {
           }
         });
         break;
-      case "A006":
+      case 'A006':
         let storedMessageRecord = `UPDATE message SET message = '${JSON.stringify(data.mq)}' WHERE id = ${data.roomId}`;
         connection().query(storedMessageRecord, (err, result) => {
           if (err) {
@@ -293,7 +294,7 @@ http.createServer((req, res) => {
           }
         });
         break;
-      case "A007":
+      case 'A007':
         let getMessageRecord = `SELECT * FROM message WHERE id LIKE ${data.roomId}`;
         connection().query(getMessageRecord, (err, result) => {
           if (err) {
@@ -307,7 +308,40 @@ http.createServer((req, res) => {
             res.end(JSON.stringify(sendData));
           }
         });
-        break
+        break;
+      case 'A008':
+        let getMessageList = `SELECT * FROM user WHERE account LIKE ${data.account}`;
+        connection().query(getMessageList, (err, result) => {
+          if (err) {
+            console.log('[SELECT ERROR] - ', err.message);
+            return false;
+          } else {
+            let arr = JSON.parse(result[0].room);
+            let str = '';
+            for (let i in arr) {
+              str += `SELECT * FROM message WHERE id = ${arr[i]};`
+            }
+            connection().query(str, (err, result) => {
+                if (err) {
+                  console.log('[SELECT ERROR] - ', err.message);
+                  return false;
+                } else {
+                  let newArr = [];
+                  for (let i in result) {
+                    if (JSON.parse(result[i][0].message).length) {
+                      newArr.push(JSON.parse(result[i][0].message).pop())
+                    }
+                  }
+                  let sendData = {
+                    status: '0000',
+                    list: newArr
+                  };
+                  res.end(JSON.stringify(sendData));
+                }
+              });
+          }
+        });
+        break;
     }
   });
 }).listen(8080);
@@ -339,7 +373,7 @@ let ws = new WebSocket.Server({port: 8081}, () => {
       }
     });
     client.on('close', (msg) => {
-      console.log('前端主动断开连接' + msg);
+      // console.log('前端主动断开连接' + msg);
     })
   });
 });

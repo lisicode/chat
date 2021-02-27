@@ -18,7 +18,8 @@ const ApiConfig = {
   getFriends: 'A004',
   queryRoomId: 'A005',
   storedMessageRecord: 'A006',
-  getMessageRecord: 'A007'
+  getMessageRecord: 'A007',
+  getMessageList: 'A008',
 };
 
 // 环境定义
