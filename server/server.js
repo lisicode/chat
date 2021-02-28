@@ -44,7 +44,7 @@ http.createServer((req, res) => {
                 let sendData = {
                   status: '0000',
                   msg: '登录成功',
-                  userData: {
+                  data: {
                     account: result[0].account,
                   }
                 };
@@ -70,7 +70,7 @@ http.createServer((req, res) => {
                   let sendData = {
                     status: '0000',
                     msg: '注册成功',
-                    userData: {
+                    data: {
                       account: data.signInData.account,
                     }
                   };
@@ -316,12 +316,13 @@ http.createServer((req, res) => {
             console.log('[SELECT ERROR] - ', err.message);
             return false;
           } else {
-            let arr = JSON.parse(result[0].room);
-            let str = '';
-            for (let i in arr) {
-              str += `SELECT * FROM message WHERE id = ${arr[i]};`
-            }
-            connection().query(str, (err, result) => {
+            if (JSON.parse(result[0].room).length) {
+              let arr = JSON.parse(result[0].room);
+              let str = '';
+              for (let i in arr) {
+                str += `SELECT * FROM message WHERE id = ${arr[i]};`
+              }
+              connection().query(str, (err, result) => {
                 if (err) {
                   console.log('[SELECT ERROR] - ', err.message);
                   return false;
@@ -339,6 +340,13 @@ http.createServer((req, res) => {
                   res.end(JSON.stringify(sendData));
                 }
               });
+            } else {
+              let sendData = {
+                status: '0000',
+                list: []
+              };
+              res.end(JSON.stringify(sendData));
+            }
           }
         });
         break;

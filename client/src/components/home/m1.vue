@@ -1,21 +1,21 @@
 <template>
   <div class="m1">
-    <van-card
-            v-if="list.length"
-            v-for="(i, index) in list"
-            :key="index"
-            :centered="true"
-            thumb="https://img01.yzcdn.cn/vant/ipad.jpeg"
-            @click="toChat(i.toId === id ? i.id : i.toId)"
-    >
-      <template #title>
-        <p>{{ i.toId === id ? i.id : i.toId }}</p>
-      </template>
-      <template #desc>
-        <span>{{ i.msg }}</span>
-      </template>
-    </van-card>
-
+    <van-row v-if="list.length">
+      <van-card
+              v-for="(i, index) in list"
+              :key="index"
+              :centered="true"
+              thumb="https://img01.yzcdn.cn/vant/ipad.jpeg"
+              @click="toChat(i.toId === id ? i.id : i.toId)"
+      >
+        <template #title>
+          <p>{{ i.toId === id ? i.id : i.toId }}</p>
+        </template>
+        <template #desc>
+          <span>{{ i.msg }}</span>
+        </template>
+      </van-card>
+    </van-row>
     <van-empty v-else description="暂无消息" />
   </div>
 </template>

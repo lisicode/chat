@@ -48,7 +48,7 @@ export default {
         }
       }).then(res => {
         if (res.status === '0000') {
-          SetLocalStorage(res.userData, 'userData');
+          SetLocalStorage(res.data, 'userData');
           this.$router.push('/home')
         } else {
           this.$notify({ type: 'danger', message: res.msg });
