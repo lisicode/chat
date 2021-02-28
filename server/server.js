@@ -350,6 +350,65 @@ http.createServer((req, res) => {
           }
         });
         break;
+      case 'A009':
+        let getUserData = `SELECT * FROM user WHERE account LIKE ${data.account}`;
+        connection().query(getUserData, (err, result) => {
+          if (err) {
+            console.log('[SELECT ERROR] - ', err.message);
+            return false;
+          } else {
+            let sendData = {
+              status: '0000',
+              data: {
+                nickname: result[0].nickname,
+                photo: result[0].photo
+              }
+            };
+            res.end(JSON.stringify(sendData));
+          }
+        });
+        break;
+      case 'A010':
+        let changeNickname = `UPDATE user SET nickname = '${data.nickname}' WHERE account = ${data.account}`;
+        connection().query(changeNickname, (err, result) => {
+          if (err) {
+            console.log('[SELECT ERROR] - ', err.message);
+            let sendData = {
+              status: '0001',
+              msg: '修改失败'
+            };
+            res.end(JSON.stringify(sendData));
+            return false;
+          } else {
+            let sendData = {
+              status: '0000',
+              msg: '修改成功'
+            };
+            res.end(JSON.stringify(sendData));
+          }
+        });
+        break;
+      case 'A011':
+        let changePhoto = `UPDATE user SET photo = '${data.photo}' WHERE account = ${data.account}`;
+        connection().query(changePhoto, (err, result) => {
+          if (err) {
+            console.log('[SELECT ERROR] - ', err.message);
+            let sendData = {
+              status: '0001',
+              msg: '修改失败'
+            };
+            res.end(JSON.stringify(sendData));
+            return false;
+          } else {
+            let sendData = {
+              status: '0000',
+              msg: '修改成功'
+            };
+            res.end(JSON.stringify(sendData));
+          }
+        });
+
+        break;
     }
   });
 }).listen(8080);

@@ -20,6 +20,9 @@ const ApiConfig = {
   storedMessageRecord: 'A006',
   getMessageRecord: 'A007',
   getMessageList: 'A008',
+  getUserData: 'A009',
+  changeNickname: 'A010',
+  changePhoto: 'A011',
 };
 
 // 环境定义
