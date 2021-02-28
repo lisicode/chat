@@ -23,8 +23,17 @@ const routes = [
       {
         path:'/m3',
         component: () => import(/* webpackChunkName: "m3" */ '../components/home/m3.vue')
-      }
+      },
+      {
+        path:'/m4',
+        component: () => import(/* webpackChunkName: "m4" */ '../components/home/m4.vue')
+      },
     ]
+  },
+  {
+    path:'/add',
+    name: 'add',
+    component: () => import(/* webpackChunkName: "add" */ '../views/add.vue')
   },
   {
     path:'/chat',

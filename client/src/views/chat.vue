@@ -101,7 +101,7 @@
     },
     methods: {
       back() {
-        this.$router.push('/m2')
+        this.$router.go(-1);
       },
       InitWebSocket() {
         this.websock = new WebSocket('ws://localhost:8081/');

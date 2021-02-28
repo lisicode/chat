@@ -1,6 +1,6 @@
 <template>
-  <div class="m3">
-   m3
+  <div class="m4">
+   m4
   </div>
 </template>
 
@@ -8,7 +8,7 @@
   import {ApiConfig, Request, GetLocalStorage} from "@/assets/js/config";
 
   export default {
-    name: 'm3',
+    name: 'm4',
     data() {
       return {
 
@@ -24,7 +24,7 @@
 </script>
 
 <style scoped lang="scss">
-  .m3 {
+  .m4 {
 
   }
 </style>

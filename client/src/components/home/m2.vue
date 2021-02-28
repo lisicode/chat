@@ -54,7 +54,7 @@
         align-items: center;
 
         img {
-          width: 30px;
+          width: 50px;
         }
 
         span {

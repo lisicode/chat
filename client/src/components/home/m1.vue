@@ -1,6 +1,21 @@
 <template>
   <div class="m1">
-    <van-cell v-if="list.length" v-for="(i, index) in list" :key="index" :title="i.toId === id ? i.id : i.toId" :label="i.msg" @click="toChat(i.toId === id ? i.id : i.toId)" />
+    <van-card
+            v-if="list.length"
+            v-for="(i, index) in list"
+            :key="index"
+            :centered="true"
+            thumb="https://img01.yzcdn.cn/vant/ipad.jpeg"
+            @click="toChat(i.toId === id ? i.id : i.toId)"
+    >
+      <template #title>
+        <p>{{ i.toId === id ? i.id : i.toId }}</p>
+      </template>
+      <template #desc>
+        <span>{{ i.msg }}</span>
+      </template>
+    </van-card>
+
     <van-empty v-else description="暂无消息" />
   </div>
 </template>
@@ -42,22 +57,20 @@ export default {
 
 <style scoped lang="scss">
 .m1 {
-  .van-cell {
-    background-color: #f7f7f7;
-    .item {
-      display: flex;
-      justify-content: left;
-      align-items: center;
-
-      img {
-        width: 30px;
-      }
-
-      span {
-        margin-left: 10px;
-        font-size: 12px;
-      }
-    }
+.van-card {
+  p {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 16px;
   }
+  span {
+    width: 100%;
+    display: inline-block;
+    font-size: 12px;
+    color: #969799;
+    overflow: hidden;
+  }
+}
+
 }
 </style>
