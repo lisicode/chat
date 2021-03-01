@@ -2,8 +2,13 @@
   <div class="m4">
     <div class="s-1">
       <section>
-        <img :src="photo === null ? 'https://img01.yzcdn.cn/vant/ipad.jpeg' : photo">
-        <p>{{ nickname }}</p>
+        <van-image
+            width="3rem"
+            height="3rem"
+            fit="cover"
+            :src="photo === null ? 'https://img01.yzcdn.cn/vant/ipad.jpeg' : photo"
+        />
+        <p>{{ nickname === null ? account : nickname }}</p>
       </section>
       <van-uploader :after-read="changePhoto">
         <van-icon name="arrow" />
@@ -57,7 +62,6 @@
     },
     methods: {
       changePhoto(file) {
-        console.log(typeof file.content);
         Request({
           method: 'post',
           data: {
@@ -66,7 +70,11 @@
             account: GetLocalStorage('userData').account
           }
         }).then(res => {
-          console.log(res)
+          if (res.status === '0000') {
+            this.$notify({ type: 'success', message: res.msg });
+          } else {
+            this.$notify({ type: 'danger', message: res.msg });
+          }
         })
       },
       changeNickname() {
@@ -104,12 +112,13 @@
       section {
         display: flex;
         align-items: center;
+        .van-image {
+          border-radius: 5px;
+          overflow: hidden;
+        }
         p {
           margin: 0 0 0 5px;
         }
-      }
-      img {
-        height: 60px;
       }
     }
     .van-cell {

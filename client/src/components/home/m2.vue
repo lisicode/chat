@@ -1,9 +1,9 @@
 <template>
   <div class="m2">
-    <van-cell v-for="(i, index) in list" :key="index" @click="toChat(i)">
+    <van-cell v-for="(i, index) in list" :key="index" @click="toChat(i.account)">
       <div class="item">
-        <img src="../../assets/logo.png"/>
-        <span class="custom-title">{{ i }}</span>
+        <img :src="i.photo === null ? 'https://img01.yzcdn.cn/vant/ipad.jpeg' : i.photo"/>
+        <span class="custom-title">{{ i.nickname === null ? i.account : i.nickname }}</span>
       </div>
     </van-cell>
   </div>
@@ -28,7 +28,7 @@
           account: GetLocalStorage('userData').account
         }
       }).then(res => {
-        this.list = JSON.parse(res.friendsList);
+        this.list = res.friendsList;
       })
     },
     methods: {

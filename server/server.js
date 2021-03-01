@@ -29,7 +29,7 @@ const connection = () => {
 http.createServer((req, res) => {
   res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
   req.on('data', (e) => {
-    let data = JSON.parse(e.toString());
+    let data = JSON.parse(e);
     switch (data.api) {
       case 'A001':
         let querySignInAccount = `SELECT * FROM user WHERE account LIKE ${data.signInData.account}`;
@@ -175,11 +175,31 @@ http.createServer((req, res) => {
             return false;
           } else {
             if (result.length) {
-              let sendData = {
-                status: '0000',
-                friendsList: result[0].friends
-              };
-              res.end(JSON.stringify(sendData));
+              let arr = JSON.parse(result[0].friends)
+              let str = '';
+              for (let i in arr) {
+                str += `SELECT * FROM user WHERE account = ${arr[i]};`
+              }
+              let friendsData = [];
+              connection().query(str, (err, result) => {
+                if (err) {
+                  console.log('[SELECT ERROR] - ', err.message);
+                  return false;
+                } else {
+                  for (let i in result) {
+                    friendsData.push({
+                      account: result[i][0].account,
+                      photo: result[i][0].photo,
+                      nickname: result[i][0].nickname,
+                    })
+                  }
+                  let sendData = {
+                    status: '0000',
+                    friendsList: friendsData
+                  };
+                  res.end(JSON.stringify(sendData));
+                }
+              });
             } else {
               let sendData = {
                 status: '0001',
