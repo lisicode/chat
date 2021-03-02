@@ -5,8 +5,8 @@
               v-for="(i, index) in list"
               :key="index"
               :centered="true"
-              thumb="https://img01.yzcdn.cn/vant/ipad.jpeg"
-              @click="toChat(i.toId === id ? i.id : i.toId)"
+              :thumb="i.photo"
+              @click="toChat(i)"
       >
         <template #title>
           <p>{{ i.toId === id ? i.id : i.toId }}</p>
@@ -46,6 +46,7 @@ export default {
   },
   methods: {
     toChat(e) {
+      e.account = e.toId === this.id ? e.id : e.toId;
       this.$router.push({
         path: '/chat',
         query: e

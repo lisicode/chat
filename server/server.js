@@ -45,7 +45,7 @@ http.createServer((req, res) => {
           } else {
             if (result.length) {
               if (result[0].password === md5(data.signInData.password)) {
-                delete result[0].password
+                delete result[0].password;
                 let sendData = {
                   status: '0000',
                   msg: '登录成功',
@@ -75,7 +75,7 @@ http.createServer((req, res) => {
                       console.log('[SELECT ERROR] - ', err.message);
                       return false;
                     } else {
-                      delete result[0].password
+                      delete result[0].password;
                       let sendData = {
                         status: '0000',
                         msg: '注册成功',
@@ -184,7 +184,7 @@ http.createServer((req, res) => {
             return false;
           } else {
             if (result.length) {
-              let arr = JSON.parse(result[0].friends)
+              let arr = JSON.parse(result[0].friends);
               let str = '';
               for (let i in arr) {
                 str += `SELECT * FROM user WHERE account = ${arr[i]};`
@@ -195,18 +195,31 @@ http.createServer((req, res) => {
                   console.log('[SELECT ERROR] - ', err.message);
                   return false;
                 } else {
-                  for (let i in result) {
+                  if (Array.isArray(result[0])) {
+                    for (let i in result) {
+                      friendsData.push({
+                        account: result[i][0].account,
+                        photo: result[i][0].photo,
+                        nickname: result[i][0].nickname,
+                      })
+                    }
+                    let sendData = {
+                      status: '0000',
+                      friendsList: friendsData
+                    };
+                    res.end(JSON.stringify(sendData));
+                  } else {
                     friendsData.push({
-                      account: result[i][0].account,
-                      photo: result[i][0].photo,
-                      nickname: result[i][0].nickname,
-                    })
+                      account: result[0].account,
+                      photo: result[0].photo,
+                      nickname: result[0].nickname,
+                    });
+                    let sendData = {
+                      status: '0000',
+                      friendsList: friendsData
+                    };
+                    res.end(JSON.stringify(sendData));
                   }
-                  let sendData = {
-                    status: '0000',
-                    friendsList: friendsData
-                  };
-                  res.end(JSON.stringify(sendData));
                 }
               });
             } else {
@@ -364,11 +377,26 @@ http.createServer((req, res) => {
                         newArr.push(JSON.parse(result[i][0].message).pop())
                       }
                     }
-                    let sendData = {
-                      status: '0000',
-                      list: newArr
-                    };
-                    res.end(JSON.stringify(sendData));
+                    // 多点信息头像
+                    let str = '';
+                    for (let i in newArr) {
+                      str += `SELECT * FROM user WHERE account = ${newArr[i].toId};`
+                    }
+                    connection().query(str, (err, result) => {
+                      if (err) {
+                        console.log('[SELECT ERROR] - ', err.message);
+                        return false;
+                      } else {
+                        for (let i in newArr) {
+                          newArr[i].photo = result[i][0].photo
+                        }
+                        let sendData = {
+                          status: '0000',
+                          list: newArr
+                        };
+                        res.end(JSON.stringify(sendData));
+                      }
+                    });
                   } else {
                     // 单点信息记录
                     for (let i in result) {
@@ -376,11 +404,24 @@ http.createServer((req, res) => {
                         newArr.push(JSON.parse(result[i].message).pop())
                       }
                     }
-                    let sendData = {
-                      status: '0000',
-                      list: newArr
-                    };
-                    res.end(JSON.stringify(sendData));
+                    // 单点信息头像
+                    let str = '';
+                    for (let i in newArr) {
+                      str += `SELECT * FROM user WHERE account = ${newArr[i].toId};`
+                    }
+                    connection().query(str, (err, result) => {
+                      if (err) {
+                        console.log('[SELECT ERROR] - ', err.message);
+                        return false;
+                      } else {
+                        newArr[0].photo = result[0].photo;
+                        let sendData = {
+                          status: '0000',
+                          list: newArr
+                        };
+                        res.end(JSON.stringify(sendData));
+                      }
+                    });
                   }
                 }
               });

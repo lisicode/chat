@@ -6,7 +6,7 @@
             width="3rem"
             height="3rem"
             fit="cover"
-            :src="photo === null ? 'https://img01.yzcdn.cn/vant/ipad.jpeg' : photo"
+            :src="photo"
         />
         <p>{{ nickname === null ? account : nickname }}</p>
       </section>
@@ -35,32 +35,44 @@
 </template>
 
 <script>
-  import {ApiConfig, Request, GetLocalStorage} from "@/assets/js/config";
+  import {ApiConfig, Request, SetLocalStorage, GetLocalStorage} from "@/assets/js/config";
 
   export default {
     name: 'm4',
     data() {
       return {
+        account: GetLocalStorage('userData').account,
         nicknamePopup: false,
         nickname: null,
         changeNicknameData: '',
         photo: null,
-        account: GetLocalStorage('userData').account
       };
     },
     created() {
-      Request({
-        method: 'post',
-        data: {
-          api: ApiConfig.getUserData,
-          account: GetLocalStorage('userData').account
-        }
-      }).then(res => {
-        this.photo = res.data.photo;
-        this.nickname = res.data.nickname;
-      })
+      this.init();
     },
     methods: {
+      init() {
+        Request({
+          method: 'post',
+          data: {
+            api: ApiConfig.getUserData,
+            account: GetLocalStorage('userData').account
+          }
+        }).then(res => {
+          this.photo = res.data.photo;
+          this.nickname = res.data.nickname;
+          let data = {
+            account: GetLocalStorage('userData').account,
+            friends: GetLocalStorage('userData').friends,
+            id: GetLocalStorage('userData').id,
+            room: GetLocalStorage('userData').room,
+            nickname: res.data.nickname,
+            photo: res.data.photo,
+          };
+          SetLocalStorage(data, 'userData');
+        })
+      },
       changePhoto(file) {
         Request({
           method: 'post',
@@ -71,6 +83,7 @@
           }
         }).then(res => {
           if (res.status === '0000') {
+            this.init();
             this.$notify({ type: 'success', message: res.msg });
           } else {
             this.$notify({ type: 'danger', message: res.msg });
@@ -87,6 +100,7 @@
           }
         }).then(res => {
           if (res.status === '0000') {
+            this.init();
             this.nicknamePopup = false;
             this.changeNicknameData = '';
           } else {

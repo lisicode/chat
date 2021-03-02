@@ -6,7 +6,7 @@
             width="3rem"
             height="3rem"
             fit="cover"
-            :src="i.photo === null ? 'https://img01.yzcdn.cn/vant/ipad.jpeg' : i.photo"
+            :src="i.photo"
         />
         <span class="custom-title">{{ i.nickname === null ? i.account : i.nickname }}</span>
       </div>

@@ -52,7 +52,7 @@
         id: GetLocalStorage('userData').account,
         windowHeight: document.documentElement.clientHeight,
         aPhoto: GetLocalStorage('userData').photo,
-        bPhoto:this.$route.query.photo
+        bPhoto: this.$route.query.photo
       };
     },
     watch: {
