@@ -348,16 +348,29 @@ http.createServer((req, res) => {
                   return false;
                 } else {
                   let newArr = [];
-                  for (let i in result) {
-                    if (JSON.parse(result[i][0].message).length) {
-                      newArr.push(JSON.parse(result[i][0].message).pop())
+                  if (Array.isArray(result[0])) {
+                    for (let i in result) {
+                      if (JSON.parse(result[i][0].message).length) {
+                        newArr.push(JSON.parse(result[i][0].message).pop())
+                      }
                     }
+                    let sendData = {
+                      status: '0000',
+                      list: newArr
+                    };
+                    res.end(JSON.stringify(sendData));
+                  } else {
+                    for (let i in result) {
+                      if (JSON.parse(result[i].message).length) {
+                        newArr.push(JSON.parse(result[i].message).pop())
+                      }
+                    }
+                    let sendData = {
+                      status: '0000',
+                      list: newArr
+                    };
+                    res.end(JSON.stringify(sendData));
                   }
-                  let sendData = {
-                    status: '0000',
-                    list: newArr
-                  };
-                  res.end(JSON.stringify(sendData));
                 }
               });
             } else {
@@ -433,7 +446,7 @@ http.createServer((req, res) => {
   });
 }).listen(8080);
 
-let ws = new WebSocket.Server({port: 8081}, () => {
+const ws = new WebSocket.Server({port: 8081}, () => {
   let allUserData = [];
   ws.on('connection', (client) => {
     client.on('message', (e) => {
