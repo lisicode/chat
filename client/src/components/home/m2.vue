@@ -3,8 +3,8 @@
     <van-cell v-for="(i, index) in list" :key="index" @click="toChat(i)">
       <div class="item">
         <van-image
-            width="2rem"
-            height="2rem"
+            width="3rem"
+            height="3rem"
             fit="cover"
             :src="i.photo === null ? 'https://img01.yzcdn.cn/vant/ipad.jpeg' : i.photo"
         />

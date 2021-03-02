@@ -39,6 +39,8 @@ export default {
         account: GetLocalStorage('userData').account
       }
     }).then(res => {
+      console.log(res)
+
       this.list = res.list;
     })
   },
@@ -46,9 +48,7 @@ export default {
     toChat(e) {
       this.$router.push({
         path: '/chat',
-        query: {
-          account: e
-        }
+        query: e
       })
     }
   }

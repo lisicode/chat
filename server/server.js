@@ -1,5 +1,4 @@
 const http = require('http');
-const qs = require('querystring');
 const mysql = require('mysql');
 const md5 = require('md5-node');
 const WebSocket = require('ws');
