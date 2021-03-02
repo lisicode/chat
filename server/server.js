@@ -1,4 +1,5 @@
 const http = require('http');
+const qs = require('querystring');
 const mysql = require('mysql');
 const md5 = require('md5-node');
 const WebSocket = require('ws');
@@ -27,9 +28,13 @@ const connection = () => {
 };
 
 http.createServer((req, res) => {
+  let body = '';
   res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
-  req.on('data', (e) => {
-    let data = JSON.parse(e);
+  req.on('data', (chunk) => {
+    body += chunk;
+  });
+  req.on('end', () => {
+    let data = JSON.parse(body);
     switch (data.api) {
       case 'A001':
         let querySignInAccount = `SELECT * FROM user WHERE account LIKE ${data.signInData.account}`;
@@ -443,7 +448,7 @@ http.createServer((req, res) => {
 
         break;
     }
-  });
+  })
 }).listen(8080);
 
 const ws = new WebSocket.Server({port: 8081}, () => {

@@ -2,7 +2,12 @@
   <div class="m2">
     <van-cell v-for="(i, index) in list" :key="index" @click="toChat(i.account)">
       <div class="item">
-        <img :src="i.photo === null ? 'https://img01.yzcdn.cn/vant/ipad.jpeg' : i.photo"/>
+        <van-image
+            width="2rem"
+            height="2rem"
+            fit="cover"
+            :src="i.photo === null ? 'https://img01.yzcdn.cn/vant/ipad.jpeg' : i.photo"
+        />
         <span class="custom-title">{{ i.nickname === null ? i.account : i.nickname }}</span>
       </div>
     </van-cell>
@@ -52,11 +57,10 @@
         display: flex;
         justify-content: left;
         align-items: center;
-
-        img {
-          width: 50px;
+        .van-image {
+          border-radius: 5px;
+          overflow: hidden;
         }
-
         span {
           margin-left: 10px;
           font-size: 12px;
