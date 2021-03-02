@@ -46,12 +46,11 @@ http.createServer((req, res) => {
           } else {
             if (result.length) {
               if (result[0].password === md5(data.signInData.password)) {
+                delete result[0].password
                 let sendData = {
                   status: '0000',
                   msg: '登录成功',
-                  data: {
-                    account: result[0].account,
-                  }
+                  data: result[0]
                 };
                 res.end(JSON.stringify(sendData));
               } else {
@@ -72,14 +71,20 @@ http.createServer((req, res) => {
                   res.end(JSON.stringify(sendData));
                   return false;
                 } else {
-                  let sendData = {
-                    status: '0000',
-                    msg: '注册成功',
-                    data: {
-                      account: data.signInData.account,
+                  connection().query(querySignInAccount, (err, result) => {
+                    if (err) {
+                      console.log('[SELECT ERROR] - ', err.message);
+                      return false;
+                    } else {
+                      delete result[0].password
+                      let sendData = {
+                        status: '0000',
+                        msg: '注册成功',
+                        data: result[0]
+                      };
+                      res.end(JSON.stringify(sendData));
                     }
-                  };
-                  res.end(JSON.stringify(sendData));
+                  });
                 }
               });
             }
@@ -354,6 +359,7 @@ http.createServer((req, res) => {
                 } else {
                   let newArr = [];
                   if (Array.isArray(result[0])) {
+                    // 多点信息记录
                     for (let i in result) {
                       if (JSON.parse(result[i][0].message).length) {
                         newArr.push(JSON.parse(result[i][0].message).pop())
@@ -365,6 +371,7 @@ http.createServer((req, res) => {
                     };
                     res.end(JSON.stringify(sendData));
                   } else {
+                    // 单点信息记录
                     for (let i in result) {
                       if (JSON.parse(result[i].message).length) {
                         newArr.push(JSON.parse(result[i].message).pop())

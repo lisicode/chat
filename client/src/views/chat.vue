@@ -9,7 +9,13 @@
     </div>
     <div class="c-2" id="chatContainer" :style="{ height: this.windowHeight - 100 + 'px' }">
       <div v-for="i in mq" :class="i.id === id ? 'a' : 'b' ">
-        <div>
+        <van-image
+            width="2rem"
+            height="2rem"
+            fit="cover"
+            :src="i.id === id ? aPhoto : bPhoto"
+        />
+        <div class="msg">
           {{ i.msg }}
         </div>
       </div>
@@ -44,7 +50,9 @@
         mq: [],
         roomId: '',
         id: GetLocalStorage('userData').account,
-        windowHeight: document.documentElement.clientHeight
+        windowHeight: document.documentElement.clientHeight,
+        aPhoto: GetLocalStorage('userData').photo,
+        bPhoto:this.$route.query.photo
       };
     },
     watch: {
@@ -162,11 +170,18 @@
         box-sizing: border-box;
         padding: 5px;
         overflow: hidden;
-        div {
+        .van-image {
+          float: right;
+          margin-left: 5px;
+          border-radius: 5px;
+          overflow: hidden;
+        }
+        .msg {
+          max-width: 200px;
+          float: right;
           box-sizing: border-box;
           padding: 5px;
           border-radius: 4px;
-          float: right;
           background-color: #07c160;
         }
       }
@@ -174,11 +189,18 @@
         box-sizing: border-box;
         padding: 5px;
         overflow: hidden;
-        div {
+        .van-image {
+          float: left;
+          margin-right: 5px;
+          border-radius: 5px;
+          overflow: hidden;
+        }
+        .msg {
+          max-width: 200px;
+          float: left;
           box-sizing: border-box;
           padding: 5px;
           border-radius: 4px;
-          float: left;
           background-color: #f7f7f7;
         }
       }

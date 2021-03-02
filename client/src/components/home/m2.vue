@@ -1,6 +1,6 @@
 <template>
   <div class="m2">
-    <van-cell v-for="(i, index) in list" :key="index" @click="toChat(i.account)">
+    <van-cell v-for="(i, index) in list" :key="index" @click="toChat(i)">
       <div class="item">
         <van-image
             width="2rem"
@@ -40,9 +40,7 @@
       toChat(e) {
         this.$router.push({
           path: '/chat',
-          query: {
-            account: e
-          }
+          query: e
         })
       }
     }
