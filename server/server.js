@@ -183,8 +183,8 @@ http.createServer((req, res) => {
             console.log('[SELECT ERROR] - ', err.message);
             return false;
           } else {
-            if (result.length) {
-              let arr = JSON.parse(result[0].friends);
+            let arr = JSON.parse(result[0].friends);
+            if (arr.length) {
               let str = '';
               for (let i in arr) {
                 str += `SELECT * FROM user WHERE account = ${arr[i]};`
@@ -380,21 +380,36 @@ http.createServer((req, res) => {
                     // 多点信息头像
                     let str = '';
                     for (let i in newArr) {
-                      str += `SELECT * FROM user WHERE account = ${newArr[i].toId};`
+                      if (newArr[i].toId === data.account) {
+                        str += `SELECT * FROM user WHERE account = ${newArr[i].id};`
+                      }else {
+                        str += `SELECT * FROM user WHERE account = ${newArr[i].toId};`
+                      }
                     }
                     connection().query(str, (err, result) => {
                       if (err) {
                         console.log('[SELECT ERROR] - ', err.message);
                         return false;
                       } else {
-                        for (let i in newArr) {
-                          newArr[i].photo = result[i][0].photo
+                        if (Array.isArray(result[0])) {
+                          for (let i in newArr) {
+                            newArr[i].photo = result[i][0].photo
+                          }
+                          let sendData = {
+                            status: '0000',
+                            list: newArr
+                          };
+                          res.end(JSON.stringify(sendData));
+                        } else {
+                          for (let i in newArr) {
+                            newArr[i].photo = result[i].photo
+                          }
+                          let sendData = {
+                            status: '0000',
+                            list: newArr
+                          };
+                          res.end(JSON.stringify(sendData));
                         }
-                        let sendData = {
-                          status: '0000',
-                          list: newArr
-                        };
-                        res.end(JSON.stringify(sendData));
                       }
                     });
                   } else {
@@ -407,7 +422,11 @@ http.createServer((req, res) => {
                     // 单点信息头像
                     let str = '';
                     for (let i in newArr) {
-                      str += `SELECT * FROM user WHERE account = ${newArr[i].toId};`
+                      if (newArr[i].toId === data.account) {
+                        str += `SELECT * FROM user WHERE account = ${newArr[i].id};`
+                      }else {
+                        str += `SELECT * FROM user WHERE account = ${newArr[i].toId};`
+                      }
                     }
                     connection().query(str, (err, result) => {
                       if (err) {
