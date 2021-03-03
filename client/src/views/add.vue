@@ -20,8 +20,13 @@
     </van-form>
     <van-cell center v-if="friendsData">
       <div class="item">
-        <img src="../assets/logo.png" />
-        <span class="custom-title">{{ friendsData }}</span>
+        <van-image
+            width="2rem"
+            height="2rem"
+            fit="cover"
+            :src="friendsData.photo"
+        />
+        <span class="custom-title">{{ friendsData.nickname }}</span>
       </div>
       <template #right-icon>
         <van-button size="small" type="info" @click="add">添加</van-button>
@@ -54,7 +59,7 @@ export default {
         }
       }).then(res => {
         if (res.status === '0000') {
-          this.friendsData = res.account;
+          this.friendsData = res;
         } else if (res.status === '0001') {
           this.friendsData = null;
         }
@@ -69,7 +74,7 @@ export default {
           data: {
             api: ApiConfig.addFriends,
             account: GetLocalStorage('userData').account,
-            friendsData: this.friendsData
+            friendsData: this.friendsData.account
           }
         }).then(res => {
           if (res.status === '0000') {

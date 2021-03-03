@@ -10,7 +10,7 @@
               :src="i.photo"
           />
           <section>
-            <p>{{ i.toId === id ? i.id : i.toId }}</p>
+            <p>{{ i.nickname === null ? i.toId === id ? i.id : i.toId : i.nickname }}</p>
             <span>{{ i.msg }}</span>
           </section>
         </div>

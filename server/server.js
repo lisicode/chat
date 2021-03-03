@@ -100,6 +100,8 @@ http.createServer((req, res) => {
             if (result.length) {
               let sendData = {
                 status: '0000',
+                nickname: result[0].nickname,
+                photo: result[0].photo,
                 account: result[0].account
               };
               res.end(JSON.stringify(sendData));
@@ -395,6 +397,7 @@ http.createServer((req, res) => {
                         if (Array.isArray(result[0])) {
                           for (let i in newArr) {
                             newArr[i].photo = result[i][0].photo
+                            newArr[i].nickname = result[i][0].nickname
                           }
                           let sendData = {
                             status: '0000',
@@ -404,6 +407,7 @@ http.createServer((req, res) => {
                         } else {
                           for (let i in newArr) {
                             newArr[i].photo = result[i].photo
+                            newArr[i].nickname = result[i].nickname
                           }
                           let sendData = {
                             status: '0000',
@@ -435,6 +439,7 @@ http.createServer((req, res) => {
                         return false;
                       } else {
                         newArr[0].photo = result[0].photo;
+                        newArr[0].nickname = result[0].nickname
                         let sendData = {
                           status: '0000',
                           list: newArr
