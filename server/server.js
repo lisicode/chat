@@ -443,7 +443,11 @@ http.createServer((req, res) => {
                     }
                     connection().query(str, (err, result) => {
                       if (err) {
-                        console.log('[SELECT ERROR] - ', err.message);
+                        let sendData = {
+                          status: '0000',
+                          list: []
+                        };
+                        res.end(JSON.stringify(sendData));
                         return false;
                       } else {
                         newArr[0].photo = result[0].photo;
