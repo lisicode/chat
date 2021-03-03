@@ -2,7 +2,7 @@
   <div class="chat">
     <div class="c-1">
       <van-nav-bar
-              :title="this.$route.query.nickname === null ? this.$route.query.toId === id ? this.$route.query.id : this.$route.query.toId : this.$route.query.nickname"
+              :title="this.$route.query.nickname === null ? this.$route.query.account : this.$route.query.nickname"
               left-arrow
               @click-left="back"
       />

@@ -369,7 +369,11 @@ http.createServer((req, res) => {
               }
               connection().query(str, (err, result) => {
                 if (err) {
-                  console.log('[SELECT ERROR] - ', err.message);
+                  let sendData = {
+                    status: '0000',
+                    list: []
+                  };
+                  res.end(JSON.stringify(sendData));
                   return false;
                 } else {
                   let newArr = [];
@@ -378,13 +382,6 @@ http.createServer((req, res) => {
                     for (let i in result) {
                       if (JSON.parse(result[i][0].message).length) {
                         newArr.push(JSON.parse(result[i][0].message).pop())
-                      } else {
-                        let sendData = {
-                          status: '0000',
-                          list: []
-                        };
-                        res.end(JSON.stringify(sendData));
-                        return false;
                       }
                     }
                     // 多点信息头像
@@ -398,7 +395,11 @@ http.createServer((req, res) => {
                     }
                     connection().query(str, (err, result) => {
                       if (err) {
-                        console.log('[SELECT ERROR] - ', err.message);
+                        let sendData = {
+                          status: '0000',
+                          list: []
+                        };
+                        res.end(JSON.stringify(sendData));
                         return false;
                       } else {
                         if (Array.isArray(result[0])) {
@@ -429,13 +430,6 @@ http.createServer((req, res) => {
                     for (let i in result) {
                       if (JSON.parse(result[i].message).length) {
                         newArr.push(JSON.parse(result[i].message).pop())
-                      } else {
-                        let sendData = {
-                          status: '0000',
-                          list: []
-                        };
-                        res.end(JSON.stringify(sendData));
-                        return false;
                       }
                     }
                     // 单点信息头像
