@@ -7,6 +7,7 @@
             height="3rem"
             fit="cover"
             :src="photo"
+            loading-icon="user-circle-o"
         />
         <p>{{ nickname === null ? account : nickname }}</p>
       </section>

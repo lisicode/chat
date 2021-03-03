@@ -25,6 +25,7 @@
             height="2rem"
             fit="cover"
             :src="friendsData.photo"
+            loading-icon="user-circle-o"
         />
         <span class="custom-title">{{ friendsData.nickname }}</span>
       </div>

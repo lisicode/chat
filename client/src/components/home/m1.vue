@@ -8,10 +8,11 @@
               height="3rem"
               fit="cover"
               :src="i.photo"
+              loading-icon="user-circle-o"
           />
           <section>
             <p>{{ i.nickname === null ? i.toId === id ? i.id : i.toId : i.nickname }}</p>
-            <span>{{ i.msg }}</span>
+            <span>{{ i.msgData.type === 'picture' ? '[图片]' : i.msgData.data }}</span>
           </section>
         </div>
       </van-cell>

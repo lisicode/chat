@@ -8,6 +8,7 @@
               height="3rem"
               fit="cover"
               :src="i.photo"
+              loading-icon="user-circle-o"
           />
           <span class="custom-title">{{ i.nickname === null ? i.account : i.nickname }}</span>
         </div>

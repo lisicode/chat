@@ -14,9 +14,18 @@
             height="2rem"
             fit="cover"
             :src="i.id === id ? aPhoto : bPhoto"
+            loading-icon="user-circle-o"
         />
         <div class="msg">
-          {{ i.msg }}
+          <span v-if="i.msgData.type === 'text'">
+            {{ i.msgData.data }}
+          </span>
+          <van-image
+              v-if="i.msgData.type === 'picture'"
+              width="5rem"
+              fit="cover"
+              :src="i.msgData.data"
+          />
         </div>
       </div>
     </div>
@@ -26,11 +35,11 @@
                 v-model="msg"
                 center
                 clearable
-                placeholder="请输入消息"
+                placeholder="按 Enter 键发送"
                 :rules="[{ required: true }]"
         >
           <template #button>
-            <van-uploader :after-read="afterRead">
+            <van-uploader :after-read="OnSendPicture">
               <van-button size="small" icon="photo-o" type="default" plain />
             </van-uploader>
           </template>
@@ -98,9 +107,10 @@
             roomId: res.roomId
           }
         }).then(res => {
+          console.log(res)
+          return
           this.mq = JSON.parse(res.mq)
         })
-
       })
     },
     destroyed() {
@@ -143,15 +153,27 @@
           type: 'send',
           id: this.id,
           toId: this.$route.query.account,
-          msg: this.msg
+          msgData: {
+            type: 'text',
+            data: this.msg
+          }
         };
         this.mq.push(data);
         this.websock.send(JSON.stringify(data));
         this.msg = '';
       },
-
-      afterRead(file) {
-        console.log(file);
+      OnSendPicture(file) {
+        let data = {
+          type: 'send',
+          id: this.id,
+          toId: this.$route.query.account,
+          msgData:  {
+            type: 'picture',
+            data: file.content
+          }
+        };
+        this.mq.push(data);
+        this.websock.send(JSON.stringify(data));
       },
     }
   }
@@ -172,11 +194,11 @@
         overflow: hidden;
         .van-image {
           float: right;
-          margin-left: 5px;
           border-radius: 5px;
           overflow: hidden;
         }
         .msg {
+          margin-right: 5px;
           max-width: 200px;
           float: right;
           box-sizing: border-box;
@@ -191,11 +213,11 @@
         overflow: hidden;
         .van-image {
           float: left;
-          margin-right: 5px;
           border-radius: 5px;
           overflow: hidden;
         }
         .msg {
+          margin-left: 5px;
           max-width: 200px;
           float: left;
           box-sizing: border-box;
