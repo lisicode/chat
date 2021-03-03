@@ -107,8 +107,6 @@
             roomId: res.roomId
           }
         }).then(res => {
-          console.log(res)
-          return
           this.mq = JSON.parse(res.mq)
         })
       })

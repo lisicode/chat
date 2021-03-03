@@ -378,6 +378,13 @@ http.createServer((req, res) => {
                     for (let i in result) {
                       if (JSON.parse(result[i][0].message).length) {
                         newArr.push(JSON.parse(result[i][0].message).pop())
+                      } else {
+                        let sendData = {
+                          status: '0000',
+                          list: []
+                        };
+                        res.end(JSON.stringify(sendData));
+                        return false;
                       }
                     }
                     // 多点信息头像
@@ -422,6 +429,13 @@ http.createServer((req, res) => {
                     for (let i in result) {
                       if (JSON.parse(result[i].message).length) {
                         newArr.push(JSON.parse(result[i].message).pop())
+                      } else {
+                        let sendData = {
+                          status: '0000',
+                          list: []
+                        };
+                        res.end(JSON.stringify(sendData));
+                        return false;
                       }
                     }
                     // 单点信息头像
