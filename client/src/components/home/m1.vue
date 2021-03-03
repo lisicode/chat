@@ -1,21 +1,21 @@
 <template>
   <div class="m1">
-    <van-row v-if="list.length">
-      <van-card
-              v-for="(i, index) in list"
-              :key="index"
-              :centered="true"
-              :thumb="i.photo"
-              @click="toChat(i)"
-      >
-        <template #title>
-          <p>{{ i.toId === id ? i.id : i.toId }}</p>
-        </template>
-        <template #desc>
-          <span>{{ i.msg }}</span>
-        </template>
-      </van-card>
-    </van-row>
+    <div v-if="list.length">
+      <van-cell v-for="(i, index) in list" :key="index" @click="toChat(i)">
+        <div class="item">
+          <van-image
+              width="3rem"
+              height="3rem"
+              fit="cover"
+              :src="i.photo"
+          />
+          <section>
+            <p>{{ i.toId === id ? i.id : i.toId }}</p>
+            <span>{{ i.msg }}</span>
+          </section>
+        </div>
+      </van-cell>
+    </div>
     <van-empty v-else description="暂无消息" />
   </div>
 </template>
@@ -39,8 +39,6 @@ export default {
         account: GetLocalStorage('userData').account
       }
     }).then(res => {
-      console.log(res)
-
       this.list = res.list;
     })
   },
@@ -58,20 +56,28 @@ export default {
 
 <style scoped lang="scss">
 .m1 {
-.van-card {
-  p {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    font-size: 16px;
+  .van-cell {
+    background-color: #f7f7f7;
+    .item {
+      display: flex;
+      align-items: center;
+      section {
+        width: 100%;
+        margin-left: 10px;
+        p {
+          margin: 0;
+          line-height: 30px;
+          font-size: 14px;
+          color: #455a64;
+        }
+        span {
+          display: inline-block;
+          width: 100%;
+          color: rgba(69, 90, 100, 0.6);
+          font-size: 12px;
+        }
+      }
+    }
   }
-  span {
-    width: 100%;
-    display: inline-block;
-    font-size: 12px;
-    color: #969799;
-    overflow: hidden;
-  }
-}
-
 }
 </style>

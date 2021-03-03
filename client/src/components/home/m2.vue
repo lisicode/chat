@@ -1,16 +1,19 @@
 <template>
   <div class="m2">
-    <van-cell v-for="(i, index) in list" :key="index" @click="toChat(i)">
-      <div class="item">
-        <van-image
-            width="3rem"
-            height="3rem"
-            fit="cover"
-            :src="i.photo"
-        />
-        <span class="custom-title">{{ i.nickname === null ? i.account : i.nickname }}</span>
-      </div>
-    </van-cell>
+    <div v-if="list.length">
+      <van-cell v-for="(i, index) in list" :key="index" @click="toChat(i)">
+        <div class="item">
+          <van-image
+              width="3rem"
+              height="3rem"
+              fit="cover"
+              :src="i.photo"
+          />
+          <span class="custom-title">{{ i.nickname === null ? i.account : i.nickname }}</span>
+        </div>
+      </van-cell>
+    </div>
+    <van-empty v-else description="暂无好友" />
   </div>
 </template>
 
@@ -61,7 +64,8 @@
         }
         span {
           margin-left: 10px;
-          font-size: 12px;
+          font-size: 14px;
+          color: #455a64;
         }
       }
     }

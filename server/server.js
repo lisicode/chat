@@ -225,7 +225,8 @@ http.createServer((req, res) => {
             } else {
               let sendData = {
                 status: '0001',
-                msg: '暂无好友'
+                msg: '暂无好友',
+                friendsList: []
               };
               res.end(JSON.stringify(sendData));
             }
