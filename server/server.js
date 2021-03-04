@@ -3,7 +3,7 @@ const mysql = require('mysql');
 const fs = require('fs');
 const url = require("url");
 const md5 = require('md5-node');
-const uuid = require('node-uuid')
+const uuid = require('node-uuid');
 const WebSocket = require('ws');
 
 const connection = () => {
@@ -338,7 +338,6 @@ http.createServer((req, res) => {
             let arr = JSON.parse(result[0].message);
             arr.push(data.mq);
             for (let i in arr) {
-              console.log(arr[i].msgData.data.includes('base64'))
               if(arr[i].msgData.type === 'picture' && arr[i].msgData.data.includes('base64')) {
                 let base64Data = arr[i].msgData.data.replace(/^data:image\/\w+;base64,/, "");
                 let dataBuffer = Buffer.from(base64Data, 'base64');
