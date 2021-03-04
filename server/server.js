@@ -1,6 +1,9 @@
 const http = require('http');
 const mysql = require('mysql');
+const fs = require('fs');
+const url = require("url");
 const md5 = require('md5-node');
+const uuid = require('node-uuid')
 const WebSocket = require('ws');
 
 const connection = () => {
@@ -389,7 +392,7 @@ http.createServer((req, res) => {
                     for (let i in newArr) {
                       if (newArr[i].toId === data.account) {
                         str += `SELECT * FROM user WHERE account = ${newArr[i].id};`
-                      }else {
+                      } else {
                         str += `SELECT * FROM user WHERE account = ${newArr[i].toId};`
                       }
                     }
@@ -437,7 +440,7 @@ http.createServer((req, res) => {
                     for (let i in newArr) {
                       if (newArr[i].toId === data.account) {
                         str += `SELECT * FROM user WHERE account = ${newArr[i].id};`
-                      }else {
+                      } else {
                         str += `SELECT * FROM user WHERE account = ${newArr[i].toId};`
                       }
                     }
@@ -511,31 +514,52 @@ http.createServer((req, res) => {
         });
         break;
       case 'A011':
-        let changePhoto = `UPDATE user SET photo = '${data.photo}' WHERE account = ${data.account}`;
-        connection().query(changePhoto, (err, result) => {
+        let base64Data = data.photo.replace(/^data:image\/\w+;base64,/, "");
+        let dataBuffer = Buffer.from(base64Data, 'base64');
+        let imgName = `${uuid.v1()}.png`;
+        fs.writeFile(`./img/${imgName}`, dataBuffer, function (err) {
           if (err) {
-            console.log('[SELECT ERROR] - ', err.message);
-            let sendData = {
-              status: '0001',
-              msg: '修改失败'
-            };
-            res.end(JSON.stringify(sendData));
-            return false;
+            console.log(err);
           } else {
-            let sendData = {
-              status: '0000',
-              msg: '修改成功'
-            };
-            res.end(JSON.stringify(sendData));
+            // 保存成功
+            let changePhoto = `UPDATE user SET photo = 'http://localhost:8081/${imgName}' WHERE account = ${data.account}`;
+            connection().query(changePhoto, (err, result) => {
+              if (err) {
+                console.log('[SELECT ERROR] - ', err.message);
+                let sendData = {
+                  status: '0001',
+                  msg: '修改失败'
+                };
+                res.end(JSON.stringify(sendData));
+                return false;
+              } else {
+                let sendData = {
+                  status: '0000',
+                  msg: '修改成功'
+                };
+                res.end(JSON.stringify(sendData));
+              }
+            });
           }
-        });
-
+        })
         break;
     }
   })
 }).listen(8080);
 
-const ws = new WebSocket.Server({port: 8081}, () => {
+http.createServer((req, res) => {
+  let pathname = url.parse(req.url).pathname;
+  res.writeHead(200, {"Content-Type": "text/plain"});
+  fs.readFile(`./img${pathname}`, function (err, data) {
+    if (err) {
+      console.log('读取错误')
+    } else {
+      res.end(data);
+    }
+  })
+}).listen(8081);
+
+const ws = new WebSocket.Server({port: 8082}, () => {
   let allUserData = [];
   ws.on('connection', (client) => {
     client.on('message', (e) => {

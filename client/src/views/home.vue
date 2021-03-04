@@ -34,7 +34,7 @@ export default {
   },
   methods: {
     InitWebSocket() {
-      this.websock = new WebSocket('ws://localhost:8081');
+      this.websock = new WebSocket('ws://localhost:8082/');
       this.websock.onmessage = this.OnMessage;
       this.websock.onopen = this.OnOpen;
       this.websock.onerror = this.OnError;
