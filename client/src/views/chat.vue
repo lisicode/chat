@@ -66,17 +66,6 @@
     },
     watch: {
       mq() {
-        // 存储聊天记录
-        Request({
-          method: 'post',
-          data: {
-            api: ApiConfig.storedMessageRecord,
-            roomId: this.roomId,
-            mq: this.mq
-          }
-        }).then(res => {
-        });
-
         // 动态调整聊天框体
         this.$nextTick(() => {
           let list = this.$el.querySelector("#chatContainer");
@@ -119,6 +108,18 @@
       back() {
         this.$router.go(-1);
       },
+      storedMessageRecord(e) {
+        // 存储聊天记录
+        Request({
+          method: 'post',
+          data: {
+            api: ApiConfig.storedMessageRecord,
+            roomId: this.roomId,
+            mq: e
+          }
+        }).then(res => {
+        });
+      },
       InitWebSocket() {
         this.websock = new WebSocket('ws://localhost:8082/');
         this.websock.onmessage = this.OnMessage;
@@ -156,6 +157,7 @@
             data: this.msg
           }
         };
+        this.storedMessageRecord(data);
         this.mq.push(data);
         this.websock.send(JSON.stringify(data));
         this.msg = '';
@@ -170,6 +172,7 @@
             data: file.content
           }
         };
+        this.storedMessageRecord(data);
         this.mq.push(data);
         this.websock.send(JSON.stringify(data));
       },

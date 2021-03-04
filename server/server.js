@@ -329,16 +329,40 @@ http.createServer((req, res) => {
         });
         break;
       case 'A006':
-        let storedMessageRecord = `UPDATE message SET message = '${JSON.stringify(data.mq)}' WHERE id = ${data.roomId}`;
-        connection().query(storedMessageRecord, (err, result) => {
+        let queryMessageRecord = `SELECT * FROM message WHERE id LIKE ${data.roomId}`;
+        connection().query(queryMessageRecord, (err, result) => {
           if (err) {
             console.log('[SELECT ERROR] - ', err.message);
             return false;
           } else {
-            let sendData = {
-              status: '0000',
-            };
-            res.end(JSON.stringify(sendData));
+            let arr = JSON.parse(result[0].message);
+            arr.push(data.mq);
+            for (let i in arr) {
+              console.log(arr[i].msgData.data.includes('base64'))
+              if(arr[i].msgData.type === 'picture' && arr[i].msgData.data.includes('base64')) {
+                let base64Data = arr[i].msgData.data.replace(/^data:image\/\w+;base64,/, "");
+                let dataBuffer = Buffer.from(base64Data, 'base64');
+                let imgName = `${uuid.v1()}.png`;
+                fs.writeFile(`./img/${imgName}`, dataBuffer, function (err) {
+                  if (err) {
+                    console.log(err);
+                  }
+                });
+                arr[i].msgData.data = `http://localhost:8081/${imgName}`
+              }
+            }
+            let storedMessageRecord = `UPDATE message SET message = '${JSON.stringify(arr)}' WHERE id = ${data.roomId}`;
+            connection().query(storedMessageRecord, (err, result) => {
+              if (err) {
+                console.log('[SELECT ERROR] - ', err.message);
+                return false;
+              } else {
+                let sendData = {
+                  status: '0000',
+                };
+                res.end(JSON.stringify(sendData));
+              }
+            });
           }
         });
         break;
