@@ -3,6 +3,7 @@
     <div v-if="list.length">
       <van-cell v-for="(i, index) in list" :key="index" @click="toChat(i)">
         <div class="item">
+          <small>{{ sortingDate(i.msgData.date) }}</small>
           <van-image
               width="3rem"
               height="3rem"
@@ -50,7 +51,16 @@ export default {
         path: '/chat',
         query: e
       })
-    }
+    },
+    sortingDate(date) {
+      date = new Date(Date.parse(date.replace(/-/g, "/")));
+      // 是否是今天
+      if (date.toString().slice(0, 10) === new Date().toString().slice(0, 10)) {
+        return date.getHours() + ':' + date.getMinutes();
+      } else {
+        return date.getMonth() + 1 + '月' + date.getDate() + '日' + date.getHours() + ':' + date.getMinutes();
+      }
+    },
   }
 }
 </script>
@@ -61,6 +71,7 @@ export default {
     background-color: #f7f7f7;
     .item {
       display: flex;
+      justify-content: left;
       align-items: center;
       section {
         width: 100%;
@@ -77,6 +88,13 @@ export default {
           color: rgba(69, 90, 100, 0.6);
           font-size: 12px;
         }
+      }
+      small {
+        position: absolute;
+        right: 0;
+        top: 0;
+        color: #455a64;
+        font-size: 12px;
       }
     }
   }

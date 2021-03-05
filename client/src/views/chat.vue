@@ -9,6 +9,7 @@
     </div>
     <div class="c-2" id="chatContainer" :style="{ height: this.windowHeight - 100 + 'px' }">
       <div v-for="i in mq" :class="i.id === id ? 'a' : 'b' ">
+        <div class="date">{{ sortingDate(i.msgData.date) }}</div>
         <van-image
             width="2rem"
             height="2rem"
@@ -40,7 +41,9 @@
         >
           <template #button>
             <van-uploader :after-read="OnSendPicture">
-              <van-button size="small" icon="photo-o" type="default" plain />
+              <div class="photo">
+                <van-icon name="photo-o" size="20px" />
+              </div>
             </van-uploader>
           </template>
         </van-field>
@@ -120,6 +123,23 @@
         }).then(res => {
         });
       },
+      getDate() {
+        let yy = new Date().getFullYear();
+        let mm = new Date().getMonth() + 1;
+        let dd = new Date().getDate();
+        let hh = new Date().getHours();
+        let mf = new Date().getMinutes() < 10 ? '0' + new Date().getMinutes() : new Date().getMinutes();
+        return yy + '-' + mm + '-' + dd + ' ' + hh + ':' + mf;
+      },
+      sortingDate(date) {
+        date = new Date(Date.parse(date.replace(/-/g, "/")));
+        // 是否是今天
+        if (date.toString().slice(0, 10) === new Date().toString().slice(0, 10)) {
+            return date.getHours() + ':' + date.getMinutes();
+        } else {
+          return date.getMonth() + 1 + '月' + date.getDate() + '日' + date.getHours() + ':' + date.getMinutes();
+        }
+      },
       InitWebSocket() {
         this.websock = new WebSocket('ws://localhost:8082/');
         this.websock.onmessage = this.OnMessage;
@@ -154,6 +174,7 @@
           toId: this.$route.query.account,
           msgData: {
             type: 'text',
+            date: this.getDate(),
             data: this.msg
           }
         };
@@ -169,6 +190,7 @@
           toId: this.$route.query.account,
           msgData:  {
             type: 'picture',
+            date: this.getDate(),
             data: file.content
           }
         };
@@ -189,6 +211,12 @@
       box-sizing: border-box;
       padding: 0 20px 0 20px;
       overflow-y: scroll;
+      .date {
+        text-align: center;
+        color: #455a64;
+        font-size: 12px;
+        line-height: 20px;
+      }
       .a {
         box-sizing: border-box;
         padding: 5px;
@@ -231,6 +259,11 @@
     .c-3 {
       box-sizing: border-box;
       border-top: 1px solid #ebedf0;
+      .photo {
+        display: flex;
+        align-items: center;
+        height: 29px;
+      }
     }
   }
 </style>
