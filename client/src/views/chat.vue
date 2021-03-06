@@ -111,18 +111,6 @@
       back() {
         this.$router.go(-1);
       },
-      storedMessageRecord(e) {
-        // 存储聊天记录
-        Request({
-          method: 'post',
-          data: {
-            api: ApiConfig.storedMessageRecord,
-            roomId: this.roomId,
-            mq: e
-          }
-        }).then(res => {
-        });
-      },
       getDate() {
         let yy = new Date().getFullYear();
         let mm = new Date().getMonth() + 1;
@@ -171,6 +159,7 @@
         let data = {
           type: 'send',
           id: this.id,
+          roomId: this.roomId,
           toId: this.$route.query.account,
           msgData: {
             type: 'text',
@@ -178,7 +167,6 @@
             data: this.msg
           }
         };
-        this.storedMessageRecord(data);
         this.mq.push(data);
         this.websock.send(JSON.stringify(data));
         this.msg = '';
@@ -187,6 +175,7 @@
         let data = {
           type: 'send',
           id: this.id,
+          roomId: this.roomId,
           toId: this.$route.query.account,
           msgData:  {
             type: 'picture',
@@ -194,7 +183,6 @@
             data: file.content
           }
         };
-        this.storedMessageRecord(data);
         this.mq.push(data);
         this.websock.send(JSON.stringify(data));
       },

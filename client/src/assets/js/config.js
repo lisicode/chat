@@ -17,12 +17,11 @@ const ApiConfig = {
   addFriends: 'A003',
   getFriends: 'A004',
   queryRoomId: 'A005',
-  storedMessageRecord: 'A006',
-  getMessageRecord: 'A007',
-  getMessageList: 'A008',
-  getUserData: 'A009',
-  changeNickname: 'A010',
-  changePhoto: 'A011',
+  getMessageRecord: 'A006',
+  getMessageList: 'A007',
+  getUserData: 'A008',
+  changeNickname: 'A009',
+  changePhoto: 'A010',
 };
 
 // 环境定义

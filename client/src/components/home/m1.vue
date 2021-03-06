@@ -5,11 +5,11 @@
         <div class="item">
           <small>{{ sortingDate(i.msgData.date) }}</small>
           <van-image
-              width="3rem"
-              height="3rem"
-              fit="cover"
-              :src="i.photo"
-              loading-icon="user-circle-o"
+                  width="3rem"
+                  height="3rem"
+                  fit="cover"
+                  :src="i.photo"
+                  loading-icon="user-circle-o"
           />
           <section>
             <p>{{ i.nickname === null ? i.toId === id ? i.id : i.toId : i.nickname }}</p>
@@ -23,80 +23,97 @@
 </template>
 
 <script>
-import {ApiConfig, GetLocalStorage, Request} from "@/assets/js/config";
+  import {ApiConfig, GetLocalStorage, Request} from "@/assets/js/config";
 
-export default {
-  name: 'm1',
-  data() {
-    return {
-      id: GetLocalStorage('userData').account,
-      list: [],
-    };
-  },
-  created() {
-    Request({
-      method: 'post',
-      data: {
-        api: ApiConfig.getMessageList,
-        account: GetLocalStorage('userData').account
+  export default {
+    name: 'm1',
+    props: ['parent'],
+    data() {
+      return {
+        id: GetLocalStorage('userData').account,
+        list: [],
+      };
+    },
+    watch: {
+      'parent.unreadMessag'(e) {
+        console.log(e)
+
+        let _this = this;
+        Request({
+          method: 'post',
+          data: {
+            api: ApiConfig.getMessageList,
+            account: GetLocalStorage('userData').account
+          }
+        }).then(res => {
+          _this.list = res.list;
+        })
       }
-    }).then(res => {
-      this.list = res.list;
-    })
-  },
-  methods: {
-    toChat(e) {
-      e.account = e.toId === this.id ? e.id : e.toId;
-      this.$router.push({
-        path: '/chat',
-        query: e
+    },
+    created() {
+      Request({
+        method: 'post',
+        data: {
+          api: ApiConfig.getMessageList,
+          account: GetLocalStorage('userData').account
+        }
+      }).then(res => {
+        this.list = res.list;
       })
     },
-    sortingDate(date) {
-      date = new Date(Date.parse(date.replace(/-/g, "/")));
-      // 是否是今天
-      if (date.toString().slice(0, 10) === new Date().toString().slice(0, 10)) {
-        return date.getHours() + ':' + date.getMinutes();
-      } else {
-        return date.getMonth() + 1 + '月' + date.getDate() + '日' + date.getHours() + ':' + date.getMinutes();
-      }
-    },
+    methods: {
+      toChat(e) {
+        e.account = e.toId === this.id ? e.id : e.toId;
+        this.$router.push({
+          path: '/chat',
+          query: e
+        })
+      },
+      sortingDate(date) {
+        date = new Date(Date.parse(date.replace(/-/g, "/")));
+        // 是否是今天
+        if (date.toString().slice(0, 10) === new Date().toString().slice(0, 10)) {
+          return date.getHours() + ':' + date.getMinutes();
+        } else {
+          return date.getMonth() + 1 + '月' + date.getDate() + '日' + date.getHours() + ':' + date.getMinutes();
+        }
+      },
+    }
   }
-}
 </script>
 
 <style scoped lang="scss">
-.m1 {
-  .van-cell {
-    background-color: #f7f7f7;
-    .item {
-      display: flex;
-      justify-content: left;
-      align-items: center;
-      section {
-        width: 100%;
-        margin-left: 10px;
-        p {
-          margin: 0;
-          line-height: 30px;
-          font-size: 14px;
-          color: #455a64;
-        }
-        span {
-          display: inline-block;
+  .m1 {
+    .van-cell {
+      background-color: #f7f7f7;
+      .item {
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        section {
           width: 100%;
-          color: rgba(69, 90, 100, 0.6);
+          margin-left: 10px;
+          p {
+            margin: 0;
+            line-height: 30px;
+            font-size: 14px;
+            color: #455a64;
+          }
+          span {
+            display: inline-block;
+            width: 100%;
+            color: rgba(69, 90, 100, 0.6);
+            font-size: 12px;
+          }
+        }
+        small {
+          position: absolute;
+          right: 0;
+          top: 0;
+          color: #455a64;
           font-size: 12px;
         }
       }
-      small {
-        position: absolute;
-        right: 0;
-        top: 0;
-        color: #455a64;
-        font-size: 12px;
-      }
     }
   }
-}
 </style>

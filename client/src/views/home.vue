@@ -9,7 +9,7 @@
         </template>
       </van-cell>
     </header>
-    <router-view></router-view>
+    <router-view :parent="parent"></router-view>
     <van-tabbar v-model="active" route>
       <van-tabbar-item icon="chat-o" to="/home">聊天</van-tabbar-item>
       <van-tabbar-item icon="friends-o" to="/m2">好友</van-tabbar-item>
@@ -20,48 +20,52 @@
 </template>
 
 <script>
-import {GetLocalStorage} from "@/assets/js/config";
+  import {GetLocalStorage} from "@/assets/js/config";
 
-export default {
-  name: 'home',
-  data() {
-    return {
-      active: 0,
-    };
-  },
-  created() {
-    this.InitWebSocket();
-  },
-  methods: {
-    InitWebSocket() {
-      this.websock = new WebSocket('ws://localhost:8082/');
-      this.websock.onmessage = this.OnMessage;
-      this.websock.onopen = this.OnOpen;
-      this.websock.onerror = this.OnError;
-      this.websock.onclose = this.OnClose;
-    },
-    OnOpen() {
-      let data = {
-        type: 'login',
-        id: GetLocalStorage('userData').account
+  export default {
+    name: 'home',
+    data() {
+      return {
+        active: 0,
+        parent: {
+          unreadMessag: ''
+        }
+
       };
-      this.websock.send(JSON.stringify(data));
     },
-    OnError() {
+    created() {
       this.InitWebSocket();
     },
-    OnClose(e) {
-      console.log('断开连接', e);
-    },
-    OnMessage(e) {
-      console.log(e)
-    },
+    methods: {
+      InitWebSocket() {
+        this.websock = new WebSocket('ws://localhost:8082/');
+        this.websock.onmessage = this.OnMessage;
+        this.websock.onopen = this.OnOpen;
+        this.websock.onerror = this.OnError;
+        this.websock.onclose = this.OnClose;
+      },
+      OnOpen() {
+        let data = {
+          type: 'login',
+          id: GetLocalStorage('userData').account
+        };
+        this.websock.send(JSON.stringify(data));
+      },
+      OnError() {
+        this.InitWebSocket();
+      },
+      OnClose(e) {
+        console.log('断开连接', e);
+      },
+      OnMessage(e) {
+        this.parent.unreadMessag = e.data;
+      },
+    }
   }
-}
 </script>
 
 <style scoped lang="scss">
-.home {
+  .home {
 
-}
+  }
 </style>

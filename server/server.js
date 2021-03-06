@@ -329,43 +329,6 @@ http.createServer((req, res) => {
         });
         break;
       case 'A006':
-        let queryMessageRecord = `SELECT * FROM message WHERE id LIKE ${data.roomId}`;
-        connection().query(queryMessageRecord, (err, result) => {
-          if (err) {
-            console.log('[SELECT ERROR] - ', err.message);
-            return false;
-          } else {
-            let arr = JSON.parse(result[0].message);
-            arr.push(data.mq);
-            for (let i in arr) {
-              if(arr[i].msgData.type === 'picture' && arr[i].msgData.data.includes('base64')) {
-                let base64Data = arr[i].msgData.data.replace(/^data:image\/\w+;base64,/, "");
-                let dataBuffer = Buffer.from(base64Data, 'base64');
-                let imgName = `${uuid.v1()}.png`;
-                fs.writeFile(`./img/${imgName}`, dataBuffer, function (err) {
-                  if (err) {
-                    console.log(err);
-                  }
-                });
-                arr[i].msgData.data = `http://localhost:8081/${imgName}`
-              }
-            }
-            let storedMessageRecord = `UPDATE message SET message = '${JSON.stringify(arr)}' WHERE id = ${data.roomId}`;
-            connection().query(storedMessageRecord, (err, result) => {
-              if (err) {
-                console.log('[SELECT ERROR] - ', err.message);
-                return false;
-              } else {
-                let sendData = {
-                  status: '0000',
-                };
-                res.end(JSON.stringify(sendData));
-              }
-            });
-          }
-        });
-        break;
-      case 'A007':
         let getMessageRecord = `SELECT * FROM message WHERE id LIKE ${data.roomId}`;
         connection().query(getMessageRecord, (err, result) => {
           if (err) {
@@ -380,7 +343,7 @@ http.createServer((req, res) => {
           }
         });
         break;
-      case 'A008':
+      case 'A007':
         let getMessageList = `SELECT * FROM user WHERE account LIKE ${data.account}`;
         connection().query(getMessageList, (err, result) => {
           if (err) {
@@ -430,8 +393,8 @@ http.createServer((req, res) => {
                       } else {
                         if (Array.isArray(result[0])) {
                           for (let i in newArr) {
-                            newArr[i].photo = result[i][0].photo
-                            newArr[i].nickname = result[i][0].nickname
+                            newArr[i].photo = result[i][0].photo;
+                            newArr[i].nickname = result[i][0].nickname;
                           }
                           let sendData = {
                             status: '0000',
@@ -440,8 +403,8 @@ http.createServer((req, res) => {
                           res.end(JSON.stringify(sendData));
                         } else {
                           for (let i in newArr) {
-                            newArr[i].photo = result[i].photo
-                            newArr[i].nickname = result[i].nickname
+                            newArr[i].photo = result[i].photo;
+                            newArr[i].nickname = result[i].nickname;
                           }
                           let sendData = {
                             status: '0000',
@@ -477,7 +440,7 @@ http.createServer((req, res) => {
                         return false;
                       } else {
                         newArr[0].photo = result[0].photo;
-                        newArr[0].nickname = result[0].nickname
+                        newArr[0].nickname = result[0].nickname;
                         let sendData = {
                           status: '0000',
                           list: newArr
@@ -498,7 +461,7 @@ http.createServer((req, res) => {
           }
         });
         break;
-      case 'A009':
+      case 'A008':
         let getUserData = `SELECT * FROM user WHERE account LIKE ${data.account}`;
         connection().query(getUserData, (err, result) => {
           if (err) {
@@ -516,7 +479,7 @@ http.createServer((req, res) => {
           }
         });
         break;
-      case 'A010':
+      case 'A009':
         let changeNickname = `UPDATE user SET nickname = '${data.nickname}' WHERE account = ${data.account}`;
         connection().query(changeNickname, (err, result) => {
           if (err) {
@@ -536,7 +499,7 @@ http.createServer((req, res) => {
           }
         });
         break;
-      case 'A011':
+      case 'A010':
         let base64Data = data.photo.replace(/^data:image\/\w+;base64,/, "");
         let dataBuffer = Buffer.from(base64Data, 'base64');
         let imgName = `${uuid.v1()}.png`;
@@ -602,7 +565,38 @@ const ws = new WebSocket.Server({port: 8082}, () => {
         case 'send':
           allUserData.some((item, i) => {
             if (item.id === data.toId) {
-              allUserData[i].ws.send(JSON.stringify(data));
+              let queryMessageRecord = `SELECT * FROM message WHERE id LIKE ${data.roomId}`;
+              connection().query(queryMessageRecord, (err, result) => {
+                if (err) {
+                  console.log('[SELECT ERROR] - ', err.message);
+                  return false;
+                } else {
+                  let arr = JSON.parse(result[0].message);
+                  arr.push(data);
+                  for (let i in arr) {
+                    if(arr[i].msgData.type === 'picture' && arr[i].msgData.data.includes('base64')) {
+                      let base64Data = arr[i].msgData.data.replace(/^data:image\/\w+;base64,/, "");
+                      let dataBuffer = Buffer.from(base64Data, 'base64');
+                      let imgName = `${uuid.v1()}.png`;
+                      fs.writeFile(`./img/${imgName}`, dataBuffer, function (err) {
+                        if (err) {
+                          console.log(err);
+                        }
+                      });
+                      arr[i].msgData.data = `http://localhost:8081/${imgName}`
+                    }
+                  }
+                  let storedMessageRecord = `UPDATE message SET message = '${JSON.stringify(arr)}' WHERE id = ${data.roomId}`;
+                  connection().query(storedMessageRecord, (err, result) => {
+                    if (err) {
+                      console.log('[SELECT ERROR] - ', err.message);
+                      return false;
+                    } else {
+                      allUserData[i].ws.send(JSON.stringify(data));
+                    }
+                  });
+                }
+              });
             }
           });
           break;
