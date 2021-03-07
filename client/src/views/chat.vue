@@ -64,7 +64,9 @@
         id: GetLocalStorage('userData').account,
         windowHeight: document.documentElement.clientHeight,
         aPhoto: GetLocalStorage('userData').photo,
-        bPhoto: this.$route.query.photo
+        bPhoto: this.$route.query.photo,
+
+        num: 0
       };
     },
     watch: {
@@ -156,8 +158,10 @@
         }
       },
       OnSend() {
+        this.num = ++this.num;
         let data = {
           type: 'send',
+          num: this.num,
           id: this.id,
           roomId: this.roomId,
           toId: this.$route.query.account,
@@ -172,8 +176,10 @@
         this.msg = '';
       },
       OnSendPicture(file) {
+        this.num = ++this.num;
         let data = {
           type: 'send',
+          num: this.num,
           id: this.id,
           roomId: this.roomId,
           toId: this.$route.query.account,

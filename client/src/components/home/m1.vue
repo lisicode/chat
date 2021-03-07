@@ -4,6 +4,7 @@
       <van-cell v-for="(i, index) in list" :key="index" @click="toChat(i)">
         <div class="item">
           <small>{{ sortingDate(i.msgData.date) }}</small>
+          <van-badge :content="i.num" />
           <van-image
                   width="3rem"
                   height="3rem"
@@ -36,8 +37,6 @@
     },
     watch: {
       'parent.unreadMessag'(e) {
-        console.log(e)
-
         let _this = this;
         Request({
           method: 'post',
@@ -46,7 +45,7 @@
             account: GetLocalStorage('userData').account
           }
         }).then(res => {
-          _this.list = res.list;
+           _this.list = res.list
         })
       }
     },
@@ -90,6 +89,12 @@
         display: flex;
         justify-content: left;
         align-items: center;
+        .van-badge {
+          position: absolute;
+          top: 0;
+          left: 0;
+          z-index: 1;
+        }
         section {
           width: 100%;
           margin-left: 10px;
