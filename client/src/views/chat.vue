@@ -65,8 +65,7 @@
         windowHeight: document.documentElement.clientHeight,
         aPhoto: GetLocalStorage('userData').photo,
         bPhoto: this.$route.query.photo,
-
-        num: 0
+        NumberOfUnreadMessages: 0
       };
     },
     watch: {
@@ -158,13 +157,13 @@
         }
       },
       OnSend() {
-        this.num = ++this.num;
+        this.NumberOfUnreadMessages = ++this.NumberOfUnreadMessages;
         let data = {
           type: 'send',
-          num: this.num,
           id: this.id,
           roomId: this.roomId,
           toId: this.$route.query.account,
+          NumberOfUnreadMessages: this.NumberOfUnreadMessages,
           msgData: {
             type: 'text',
             date: this.getDate(),
@@ -176,13 +175,13 @@
         this.msg = '';
       },
       OnSendPicture(file) {
-        this.num = ++this.num;
+        this.NumberOfUnreadMessages = ++this.NumberOfUnreadMessages;
         let data = {
           type: 'send',
-          num: this.num,
           id: this.id,
           roomId: this.roomId,
           toId: this.$route.query.account,
+          NumberOfUnreadMessages: this.NumberOfUnreadMessages,
           msgData:  {
             type: 'picture',
             date: this.getDate(),

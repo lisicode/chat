@@ -4,7 +4,7 @@
       <van-cell v-for="(i, index) in list" :key="index" @click="toChat(i)">
         <div class="item">
           <small>{{ sortingDate(i.msgData.date) }}</small>
-          <van-badge :content="i.num" />
+          <van-badge :content="i.NumberOfUnreadMessages" />
           <van-image
                   width="3rem"
                   height="3rem"
@@ -45,7 +45,7 @@
             account: GetLocalStorage('userData').account
           }
         }).then(res => {
-           _this.list = res.list
+           _this.list = res.list;
         })
       }
     },
