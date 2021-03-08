@@ -101,19 +101,19 @@
           }
         }).then(res => {
           this.mq = JSON.parse(res.mq);
+          // 重置未读消息数据
           for (let i in this.mq) {
             if (this.mq[i].toId === this.id) {
-              // 重置未读消息数据
-              let data = {
-                type: 'unread',
-                toId: this.$route.query.account,
-                roomId: this.roomId,
-                mq: this.mq
-              };
-              this.websock.send(JSON.stringify(data));
-              return;
+              this.mq[i].unread = null
             }
           }
+          let data = {
+            type: 'unread',
+            toId: this.$route.query.account,
+            roomId: this.roomId,
+            mq: this.mq
+          };
+          this.websock.send(JSON.stringify(data));
         })
       })
     },
@@ -165,7 +165,18 @@
           case 'send':
             if (this.$route.query.account != data.toId) {
               if (this.$route.query.account === data.id) {
+                // 重置未读消息数据
+                if (data.toId === this.id) {
+                  data.unread = null
+                }
+                let sendData = {
+                  type: 'unread',
+                  toId: this.$route.query.account,
+                  roomId: this.roomId,
+                  mq: this.mq
+                };
                 this.mq.push(data);
+                this.websock.send(JSON.stringify(sendData));
               } else {
                 this.$notify({ type: 'success', message: '您有一条新消息'});
               }
