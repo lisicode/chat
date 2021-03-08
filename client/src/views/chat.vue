@@ -100,15 +100,20 @@
             roomId: res.roomId
           }
         }).then(res => {
-          this.mq = JSON.parse(res.mq)
-          // 重置未读消息数据
-          let data = {
-            type: 'unread',
-            toId: this.$route.query.account,
-            roomId: this.roomId,
-            mq: this.mq
-          };
-          this.websock.send(JSON.stringify(data));
+          this.mq = JSON.parse(res.mq);
+          for (let i in this.mq) {
+            if (this.mq[i].toId === this.id) {
+              // 重置未读消息数据
+              let data = {
+                type: 'unread',
+                toId: this.$route.query.account,
+                roomId: this.roomId,
+                mq: this.mq
+              };
+              this.websock.send(JSON.stringify(data));
+              return;
+            }
+          }
         })
       })
     },
