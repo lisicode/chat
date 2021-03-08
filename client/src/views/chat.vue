@@ -101,6 +101,14 @@
           }
         }).then(res => {
           this.mq = JSON.parse(res.mq)
+          // 重置未读消息数据
+          let data = {
+            type: 'unread',
+            toId: this.$route.query.account,
+            roomId: this.roomId,
+            mq: this.mq
+          };
+          this.websock.send(JSON.stringify(data));
         })
       })
     },
@@ -148,22 +156,29 @@
       },
       OnMessage(e) {
         let data = JSON.parse(e.data);
-        if (this.$route.query.account != data.toId) {
-          if (this.$route.query.account === data.id) {
-            this.mq.push(data);
-          } else {
-            this.$notify({ type: 'success', message: '您有一条新消息'});
-          }
+        switch (data.type) {
+          case 'send':
+            if (this.$route.query.account != data.toId) {
+              if (this.$route.query.account === data.id) {
+                this.mq.push(data);
+              } else {
+                this.$notify({ type: 'success', message: '您有一条新消息'});
+              }
+            }
+            break;
+          case "unread":
+            // 重置未读消息数
+            this.unread = 0;
+            break;
         }
       },
       OnSend() {
-        this.unread = ++this.unread;
         let data = {
           type: 'send',
           id: this.id,
           roomId: this.roomId,
           toId: this.$route.query.account,
-          unread: this.unread,
+          unread: ++this.unread,
           msgData: {
             type: 'text',
             date: this.getDate(),
@@ -175,13 +190,12 @@
         this.msg = '';
       },
       OnSendPicture(file) {
-        this.unread = ++this.unread;
         let data = {
           type: 'send',
           id: this.id,
           roomId: this.roomId,
           toId: this.$route.query.account,
-          unread: this.unread,
+          unread: ++this.unread,
           msgData:  {
             type: 'picture',
             date: this.getDate(),

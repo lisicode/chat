@@ -600,6 +600,24 @@ const ws = new WebSocket.Server({port: 8082}, () => {
             });
           });
           break;
+        case 'unread':
+          allUserData.some((item, i) => {
+            for (let i in data.mq) {
+              data.mq[i].unread = null
+            }
+            let storedMessageUnread = `UPDATE message SET message = '${JSON.stringify(data.mq)}' WHERE id = ${data.roomId}`;
+            connection().query(storedMessageUnread, (err, result) => {
+              if (err) {
+                console.log('[SELECT ERROR] - ', err.message);
+                return false;
+              } else {
+                if (item.id === data.toId) {
+                  allUserData[i].ws.send(JSON.stringify(data));
+                }
+              }
+            });
+          })
+          break;
       }
     });
     client.on('close', (msg) => {
