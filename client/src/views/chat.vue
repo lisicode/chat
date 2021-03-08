@@ -60,12 +60,12 @@
       return {
         msg: '',
         mq: [],
+        unread: 0,
         roomId: '',
         id: GetLocalStorage('userData').account,
-        windowHeight: document.documentElement.clientHeight,
         aPhoto: GetLocalStorage('userData').photo,
         bPhoto: this.$route.query.photo,
-        unread: 0
+        windowHeight: document.documentElement.clientHeight,
       };
     },
     watch: {

@@ -564,40 +564,40 @@ const ws = new WebSocket.Server({port: 8082}, () => {
           break;
         case 'send':
           allUserData.some((item, i) => {
-            if (item.id === data.toId) {
-              let queryMessageRecord = `SELECT * FROM message WHERE id LIKE ${data.roomId}`;
-              connection().query(queryMessageRecord, (err, result) => {
-                if (err) {
-                  console.log('[SELECT ERROR] - ', err.message);
-                  return false;
-                } else {
-                  let arr = JSON.parse(result[0].message);
-                  arr.push(data);
-                  for (let i in arr) {
-                    if(arr[i].msgData.type === 'picture' && arr[i].msgData.data.includes('base64')) {
-                      let base64Data = arr[i].msgData.data.replace(/^data:image\/\w+;base64,/, "");
-                      let dataBuffer = Buffer.from(base64Data, 'base64');
-                      let imgName = `${uuid.v1()}.png`;
-                      fs.writeFile(`./img/${imgName}`, dataBuffer, function (err) {
-                        if (err) {
-                          console.log(err);
-                        }
-                      });
-                      arr[i].msgData.data = `http://localhost:8081/${imgName}`
-                    }
+            let queryMessageRecord = `SELECT * FROM message WHERE id LIKE ${data.roomId}`;
+            connection().query(queryMessageRecord, (err, result) => {
+              if (err) {
+                console.log('[SELECT ERROR] - ', err.message);
+                return false;
+              } else {
+                let arr = JSON.parse(result[0].message);
+                arr.push(data);
+                for (let i in arr) {
+                  if(arr[i].msgData.type === 'picture' && arr[i].msgData.data.includes('base64')) {
+                    let base64Data = arr[i].msgData.data.replace(/^data:image\/\w+;base64,/, "");
+                    let dataBuffer = Buffer.from(base64Data, 'base64');
+                    let imgName = `${uuid.v1()}.png`;
+                    fs.writeFile(`./img/${imgName}`, dataBuffer, function (err) {
+                      if (err) {
+                        console.log(err);
+                      }
+                    });
+                    arr[i].msgData.data = `http://localhost:8081/${imgName}`
                   }
-                  let storedMessageRecord = `UPDATE message SET message = '${JSON.stringify(arr)}' WHERE id = ${data.roomId}`;
-                  connection().query(storedMessageRecord, (err, result) => {
-                    if (err) {
-                      console.log('[SELECT ERROR] - ', err.message);
-                      return false;
-                    } else {
+                }
+                let storedMessageRecord = `UPDATE message SET message = '${JSON.stringify(arr)}' WHERE id = ${data.roomId}`;
+                connection().query(storedMessageRecord, (err, result) => {
+                  if (err) {
+                    console.log('[SELECT ERROR] - ', err.message);
+                    return false;
+                  } else {
+                    if (item.id === data.toId) {
                       allUserData[i].ws.send(JSON.stringify(data));
                     }
-                  });
-                }
-              });
-            }
+                  }
+                });
+              }
+            });
           });
           break;
       }

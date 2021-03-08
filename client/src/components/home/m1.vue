@@ -4,7 +4,7 @@
       <van-cell v-for="(i, index) in list" :key="index" @click="toChat(i)">
         <div class="item">
           <small>{{ sortingDate(i.msgData.date) }}</small>
-          <van-badge :content="i.unread" />
+          <van-badge :content="i.toId === id ? i.unread : null" />
           <van-image
                   width="3rem"
                   height="3rem"
