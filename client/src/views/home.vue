@@ -13,7 +13,7 @@
     <van-tabbar v-model="active" route>
       <van-tabbar-item icon="chat-o" to="/home" :badge="parent.unreadNum">聊天</van-tabbar-item>
       <van-tabbar-item icon="friends-o" to="/m2">好友</van-tabbar-item>
-      <van-tabbar-item icon="like-o" to="/m3">朋友圈</van-tabbar-item>
+      <van-tabbar-item icon="star-o" to="/m3">发现</van-tabbar-item>
       <van-tabbar-item icon="user-circle-o" to="/m4">我的</van-tabbar-item>
     </van-tabbar>
   </div>
