@@ -45,7 +45,19 @@
             account: GetLocalStorage('userData').account
           }
         }).then(res => {
-           _this.list = res.list;
+          _this.list = res.list;
+          // 总未读消息数汇总
+          let arr = []
+          let num = 0;
+          for (let i in this.list) {
+            if (this.list[i].unread) {
+              arr.push(this.list[i].unread)
+            }
+          }
+          arr.forEach(item => {
+            num = num + item
+          })
+          this.$emit('changeUnreadNum', num)
         })
       }
     },
@@ -58,6 +70,18 @@
         }
       }).then(res => {
         this.list = res.list;
+        // 总未读消息数汇总
+        let arr = []
+        let num = 0;
+        for (let i in this.list) {
+          if (this.list[i].unread) {
+            arr.push(this.list[i].unread)
+          }
+        }
+        arr.forEach(item => {
+          num = num + item
+        })
+        this.$emit('changeUnreadNum', num)
       })
     },
     methods: {
