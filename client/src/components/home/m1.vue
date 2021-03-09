@@ -3,7 +3,7 @@
     <div v-if="list.length">
       <van-cell v-for="(i, index) in list" :key="index" @click="toChat(i)">
         <div class="item">
-          <small>{{ sortingDate(i.msgData.date) }}</small>
+          <small>{{ formatTime(i.msgData.date) }}</small>
           <van-badge :content="i.toId === id ? i.unread : null" />
           <van-image
                   width="3rem"
@@ -24,7 +24,7 @@
 </template>
 
 <script>
-  import {ApiConfig, GetLocalStorage, Request} from "@/assets/js/config";
+  import {ApiConfig, GetLocalStorage, Request, FormatTime} from "@/assets/js/config";
 
   export default {
     name: 'm1',
@@ -47,7 +47,7 @@
         }).then(res => {
           _this.list = res.list;
           // 总未读消息数汇总
-          let arr = []
+          let arr = [];
           let num = 0;
           for (let i in this.list) {
             if (this.list[i].unread) {
@@ -56,7 +56,7 @@
           }
           arr.forEach(item => {
             num = num + item
-          })
+          });
           this.$emit('changeUnreadNum', num)
         })
       }
@@ -71,16 +71,18 @@
       }).then(res => {
         this.list = res.list;
         // 总未读消息数汇总
-        let arr = []
+        let arr = [];
         let num = 0;
         for (let i in this.list) {
-          if (this.list[i].unread) {
-            arr.push(this.list[i].unread)
+          if (this.list[i].toId === this.id) {
+            if (this.list[i].unread) {
+              arr.push(this.list[i].unread)
+            }
           }
         }
         arr.forEach(item => {
           num = num + item
-        })
+        });
         this.$emit('changeUnreadNum', num)
       })
     },
@@ -92,14 +94,8 @@
           query: e
         })
       },
-      sortingDate(date) {
-        date = new Date(Date.parse(date.replace(/-/g, "/")));
-        // 是否是今天
-        if (date.toString().slice(0, 10) === new Date().toString().slice(0, 10)) {
-          return date.getHours() + ':' + date.getMinutes();
-        } else {
-          return date.getMonth() + 1 + '月' + date.getDate() + '日' + date.getHours() + ':' + date.getMinutes();
-        }
+      formatTime(e) {
+        return FormatTime(e);
       },
     }
   }

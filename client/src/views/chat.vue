@@ -9,7 +9,7 @@
     </div>
     <div class="c-2" id="chatContainer" :style="{ height: this.windowHeight - 100 + 'px' }">
       <div v-for="i in mq" :class="i.id === id ? 'a' : 'b' ">
-        <div class="date">{{ sortingDate(i.msgData.date) }}</div>
+        <div class="date">{{ formatTime(i.msgData.date) }}</div>
         <van-image
             width="2rem"
             height="2rem"
@@ -53,7 +53,7 @@
 </template>
 
 <script>
-  import {ApiConfig, Request, GetLocalStorage} from "@/assets/js/config";
+  import {ApiConfig, Request, GetLocalStorage, AcquisitionTime, FormatTime} from "@/assets/js/config";
   export default {
     name: 'chat',
     data() {
@@ -125,22 +125,8 @@
       back() {
         this.$router.go(-1);
       },
-      getDate() {
-        let yy = new Date().getFullYear();
-        let mm = new Date().getMonth() + 1;
-        let dd = new Date().getDate();
-        let hh = new Date().getHours();
-        let mf = new Date().getMinutes() < 10 ? '0' + new Date().getMinutes() : new Date().getMinutes();
-        return yy + '-' + mm + '-' + dd + ' ' + hh + ':' + mf;
-      },
-      sortingDate(date) {
-        date = new Date(Date.parse(date.replace(/-/g, "/")));
-        // 是否是今天
-        if (date.toString().slice(0, 10) === new Date().toString().slice(0, 10)) {
-            return date.getHours() + ':' + date.getMinutes();
-        } else {
-          return date.getMonth() + 1 + '月' + date.getDate() + '日' + date.getHours() + ':' + date.getMinutes();
-        }
+      formatTime(e) {
+        return FormatTime(e);
       },
       InitWebSocket() {
         this.websock = new WebSocket('ws://localhost:8082/');
@@ -197,7 +183,7 @@
           unread: ++this.unread,
           msgData: {
             type: 'text',
-            date: this.getDate(),
+            date: AcquisitionTime(),
             data: this.msg
           }
         };
@@ -214,7 +200,7 @@
           unread: ++this.unread,
           msgData:  {
             type: 'picture',
-            date: this.getDate(),
+            date: AcquisitionTime(),
             data: file.content
           }
         };

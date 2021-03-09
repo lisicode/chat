@@ -37,6 +37,32 @@ const GetLocalStorage = (name) => {
   return JSON.parse(localStorage.getItem(name));
 };
 
+const AcquisitionTime = () => {
+  let date = new Date();
+  let y = date.getFullYear();
+  let m = date.getMonth() + 1;
+  m = m < 10 ? ('0' + m) : m;
+  let d = date.getDate();
+  d = d < 10 ? ('0' + d) : d;
+  let h = date.getHours();
+  h = h < 10 ? ('0' + h) : h;
+  let minute = date.getMinutes();
+  minute = minute < 10 ? ('0' + minute) : minute;
+  return y + '-' + m + '-' + d + ' ' + h + ':' + minute;
+};
+
+const FormatTime = (date) => {
+  if (new Date(Date.parse(date.replace(/-/g, "/"))).toString().slice(0, 10) === new Date().toString().slice(0, 10)) {
+    let h = new Date(Date.parse(date.replace(/-/g, "/"))).getHours();
+    h = h < 10 ? ('0' + h) : h;
+    let minute = new Date(Date.parse(date.replace(/-/g, "/"))).getMinutes();
+    minute = minute < 10 ? ('0' + minute) : minute;
+    return h + ':' + minute;
+  } else {
+    return date;
+  }
+};
+
 // 创建请求实例
 const Request = axios.create({
   timeout: 7000,
@@ -56,4 +82,4 @@ Request.interceptors.response.use(response => {
   console.log(error)
 });
 
-export {ApiConfig, Request, SetLocalStorage, GetLocalStorage}
+export {ApiConfig, Request, SetLocalStorage, GetLocalStorage, AcquisitionTime, FormatTime}

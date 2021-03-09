@@ -1,7 +1,6 @@
 <template>
   <div class="circles">
     <van-nav-bar
-        :border="false"
         left-arrow
         @click-left="toBack"
     >
@@ -40,7 +39,7 @@ export default {
   },
   methods: {
     toBack() {
-      this.$router.go(-1);
+      this.$router.push('/m3');
     },
     toEdit() {
       this.$router.push('/edit');
@@ -55,7 +54,7 @@ export default {
   section {
     box-sizing: border-box;
     padding: 10px;
-    margin-bottom: 20px;
+    margin-top: 10px;
     border-bottom: 1px solid #fafafa;
     .s-1 {
       line-height: 20px;
