@@ -502,14 +502,14 @@ http.createServer((req, res) => {
       case 'A010':
         let base64Data = data.photo.replace(/^data:image\/\w+;base64,/, "");
         let dataBuffer = Buffer.from(base64Data, 'base64');
-        let imgName = `${uuid.v1()}.png`;
-        fs.writeFile(`./img/${imgName}`, dataBuffer, function (err) {
+        let imgName = `p-1${uuid.v1()}.png`;
+        fs.writeFile(`./img/p-1/${imgName}`, dataBuffer, function (err) {
           if (err) {
             console.log(err);
           } else {
             // 保存成功
             let changePhoto = `UPDATE user SET photo = 'http://localhost:8081/${imgName}' WHERE account = ${data.account}`;
-            connection().query(changePhoto, (err, result) => {
+            connection().query(changePhoto, (err) => {
               if (err) {
                 console.log('[SELECT ERROR] - ', err.message);
                 let sendData = {
@@ -527,16 +527,17 @@ http.createServer((req, res) => {
               }
             });
           }
-        })
+        });
         break;
     }
   })
 }).listen(8080);
 
 http.createServer((req, res) => {
-  let pathname = url.parse(req.url).pathname;
   res.writeHead(200, {"Content-Type": "text/plain"});
-  fs.readFile(`./img${pathname}`, function (err, data) {
+  let pathname = url.parse(req.url).pathname;
+  let path = pathname.substring(1,4);
+  fs.readFile(`./img/${path}${pathname}`, function (err, data) {
     if (err) {
       console.log('读取错误')
     } else {
@@ -576,8 +577,8 @@ const ws = new WebSocket.Server({port: 8082}, () => {
                   if(arr[i].msgData.type === 'picture' && arr[i].msgData.data.includes('base64')) {
                     let base64Data = arr[i].msgData.data.replace(/^data:image\/\w+;base64,/, "");
                     let dataBuffer = Buffer.from(base64Data, 'base64');
-                    let imgName = `${uuid.v1()}.png`;
-                    fs.writeFile(`./img/${imgName}`, dataBuffer, function (err) {
+                    let imgName = `p-2${uuid.v1()}.png`;
+                    fs.writeFile(`./img/p-2/${imgName}`, dataBuffer, function (err) {
                       if (err) {
                         console.log(err);
                       }

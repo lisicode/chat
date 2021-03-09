@@ -15,6 +15,7 @@
               rows="2"
               type="textarea"
               placeholder="这一刻的想法..."
+              :rules="[{ required: true }]"
       />
       <section>
         <van-uploader v-model="circlesData.picture" />
@@ -24,7 +25,7 @@
 </template>
 
 <script>
-import {ApiConfig, Request, GetLocalStorage} from "@/assets/js/config";
+import {ApiConfig, Request, GetLocalStorage, AcquisitionTime} from "@/assets/js/config";
 
 export default {
   name: 'edit',
@@ -32,7 +33,7 @@ export default {
     return {
       circlesData: {
         text: '',
-        date: '',
+        date: AcquisitionTime(),
         picture: [],
       }
     };
