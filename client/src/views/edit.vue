@@ -44,6 +44,19 @@ export default {
   methods: {
     onSubmit() {
       console.log(this.circlesData)
+
+      Request({
+        method: 'post',
+        data: {
+          api: ApiConfig.onSubmitCircles,
+          account: GetLocalStorage('userData').account,
+          circlesData: this.circlesData
+        }
+      }).then(res => {
+        console.log(res)
+      })
+
+
     }
   }
 }

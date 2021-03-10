@@ -503,7 +503,7 @@ http.createServer((req, res) => {
         let base64Data = data.photo.replace(/^data:image\/\w+;base64,/, "");
         let dataBuffer = Buffer.from(base64Data, 'base64');
         let imgName = `p-1${uuid.v1()}.png`;
-        fs.writeFile(`./img/p-1/${imgName}`, dataBuffer, function (err) {
+        fs.writeFile(`./img/p-1/${imgName}`, dataBuffer, function (err, result) {
           if (err) {
             console.log(err);
           } else {
@@ -526,6 +526,69 @@ http.createServer((req, res) => {
                 res.end(JSON.stringify(sendData));
               }
             });
+          }
+        });
+        break;
+      case 'A011':
+        for (let i in data.circlesData.picture) {
+          let base64Data = data.circlesData.picture[i].content.replace(/^data:image\/\w+;base64,/, "");
+          let dataBuffer = Buffer.from(base64Data, 'base64');
+          let imgName = `p-3${uuid.v1()}.png`;
+          data.circlesData.picture[i] = `http://localhost:8081/${imgName}`
+          fs.writeFile(`./img/p-3/${imgName}`, dataBuffer, function (err) {
+            if (err) {
+              console.log(err);
+            }
+          });
+        }
+        let queryCirclesData = `SELECT * FROM circles WHERE account LIKE ${data.account}`;
+        connection().query(queryCirclesData, (err, result) => {
+          if (err) {
+            console.log('[SELECT ERROR] - ', err.message);
+            return false;
+          } else {
+            if (result.length) {
+              let arr = JSON.parse(result[0].circles);
+              arr.push(data.circlesData);
+              let changeCircles = `UPDATE circles SET circles = '${JSON.stringify(arr)}' WHERE account = ${data.account}`;
+              connection().query(changeCircles, (err, result) => {
+                if (err) {
+                  console.log('[SELECT ERROR] - ', err.message);
+                  let sendData = {
+                    status: '0001',
+                    msg: '发表失败'
+                  };
+                  res.end(JSON.stringify(sendData));
+                  return false;
+                } else {
+                  let sendData = {
+                    status: '0000',
+                    msg: '发表成功'
+                  };
+                  res.end(JSON.stringify(sendData));
+                }
+              });
+            } else {
+              let newArr = [data.circlesData];
+              let intoCircles = `INSERT INTO circles(account, circles) VALUES ('${data.account}', '${JSON.stringify(newArr)}')`;
+              connection().query(intoCircles, (err, result) => {
+                if (err) {
+                  console.log('[SELECT ERROR] - ', err.message);
+                  let sendData = {
+                    status: '0001',
+                    msg: '发表失败'
+                  };
+                  res.end(JSON.stringify(sendData));
+                  return false;
+                } else {
+                  let sendData = {
+                    status: '0000',
+                    msg: '发表成功'
+                  };
+                  res.end(JSON.stringify(sendData));
+                }
+              });
+            }
           }
         });
         break;

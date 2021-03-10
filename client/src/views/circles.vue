@@ -2,6 +2,7 @@
   <div class="circles">
     <van-nav-bar
         left-arrow
+        title="朋友圈"
         @click-left="toBack"
     >
       <template #right>
