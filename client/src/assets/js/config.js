@@ -22,7 +22,8 @@ const ApiConfig = {
   getUserData: 'A008',
   changeNickname: 'A009',
   changePhoto: 'A010',
-  onSubmitCircles: 'A011'
+  onSubmitCircles: 'A011',
+  getCircles: 'A012'
 };
 
 // 环境定义

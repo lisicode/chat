@@ -592,6 +592,44 @@ http.createServer((req, res) => {
           }
         });
         break;
+      case 'A012':
+        let queryFriendsCircles = `SELECT * FROM user WHERE account LIKE ${data.account}`;
+        connection().query(queryFriendsCircles, (err, result) => {
+          if (err) {
+            console.log('[SELECT ERROR] - ', err.message);
+            return false;
+          } else {
+            if (JSON.parse(result[0].friends).length) {
+              let arr = JSON.parse(result[0].friends);
+              arr.push(data.account)
+              let str = '';
+              for (let i in arr) {
+                str += `SELECT * FROM circles WHERE account = ${arr[i]};`
+              }
+              connection().query(str, (err, result) => {
+                if (err) {
+                  return false;
+                } else {
+                  let mergeArr = [];
+                  for (let i in result) {
+                    if (result[i].length) {
+                      if (JSON.parse(result[i][0].circles).length) {
+                        mergeArr.push(result[i][0].circles);
+                      }
+                    }
+                  }
+                  console.log(mergeArr)
+
+                }
+              });
+
+            } else {
+
+            }
+
+          }
+        })
+        break;
     }
   })
 }).listen(8080);

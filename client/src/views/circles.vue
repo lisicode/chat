@@ -36,6 +36,15 @@ export default {
     return {};
   },
   created() {
+    Request({
+      method: 'post',
+      data: {
+        api: ApiConfig.getCircles,
+        account: GetLocalStorage('userData').account,
+      }
+    }).then(res => {
+      console.log(res)
+    })
 
   },
   methods: {

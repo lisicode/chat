@@ -33,8 +33,9 @@ export default {
     return {
       circlesData: {
         text: '',
-        date: AcquisitionTime(),
         picture: [],
+        date: AcquisitionTime(),
+        nickname: GetLocalStorage('userData').nickname,
       }
     };
   },
@@ -43,8 +44,6 @@ export default {
   },
   methods: {
     onSubmit() {
-      console.log(this.circlesData)
-
       Request({
         method: 'post',
         data: {
@@ -53,10 +52,10 @@ export default {
           circlesData: this.circlesData
         }
       }).then(res => {
-        console.log(res)
+        if (res.status === '0000') {
+          this.$router.push('/circles')
+        }
       })
-
-
     }
   }
 }
