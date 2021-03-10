@@ -34,8 +34,11 @@ export default {
       circlesData: {
         text: '',
         picture: [],
+        comment: [],
         date: AcquisitionTime(),
+        photo: GetLocalStorage('userData').photo,
         nickname: GetLocalStorage('userData').nickname,
+        account: GetLocalStorage('userData').account
       }
     };
   },

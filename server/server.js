@@ -601,7 +601,7 @@ http.createServer((req, res) => {
           } else {
             if (JSON.parse(result[0].friends).length) {
               let arr = JSON.parse(result[0].friends);
-              arr.push(data.account)
+              arr.push(data.account);
               let str = '';
               for (let i in arr) {
                 str += `SELECT * FROM circles WHERE account = ${arr[i]};`
@@ -614,21 +614,48 @@ http.createServer((req, res) => {
                   for (let i in result) {
                     if (result[i].length) {
                       if (JSON.parse(result[i][0].circles).length) {
-                        mergeArr.push(result[i][0].circles);
+                        for (let s in JSON.parse(result[i][0].circles)) {
+                          mergeArr.push(JSON.parse(result[i][0].circles)[s])
+                        }
                       }
                     }
                   }
-                  console.log(mergeArr)
-
+                  // 发表时间反序
+                  let ReverseRankingDate = (data, p) => {
+                    for (let i = 0; i < data.length - 1; i++) {
+                      for (let j = 0; j < data.length - 1 - i; j++) {
+                        if (Date.parse(data[j][p]) < Date.parse(data[j + 1][p])) {
+                          let temp = data[j];
+                          data[j] = data[j + 1];
+                          data[j + 1] = temp;
+                        }
+                      }
+                    }
+                    return data;
+                  };
+                  mergeArr = ReverseRankingDate(mergeArr, 'date');
+                  let sendData = {
+                    status: '0000',
+                    friendsCircles: mergeArr
+                  };
+                  res.end(JSON.stringify(sendData));
                 }
               });
-
             } else {
-
+              connection().query(`SELECT * FROM circles WHERE account = ${data.account};`, (err, result) => {
+                if (err) {
+                  return false;
+                } else {
+                  let sendData = {
+                    status: '0000',
+                    friendsCircles: JSON.parse(result[0].circles)
+                  };
+                  res.end(JSON.stringify(sendData));
+                }
+              });
             }
-
           }
-        })
+        });
         break;
     }
   })
