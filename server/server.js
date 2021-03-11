@@ -534,7 +534,7 @@ http.createServer((req, res) => {
           let base64Data = data.circlesData.picture[i].content.replace(/^data:image\/\w+;base64,/, "");
           let dataBuffer = Buffer.from(base64Data, 'base64');
           let imgName = `p-3${uuid.v1()}.png`;
-          data.circlesData.picture[i] = `http://localhost:8081/${imgName}`
+          data.circlesData.picture[i] = `http://localhost:8081/${imgName}`;
           fs.writeFile(`./img/p-3/${imgName}`, dataBuffer, function (err) {
             if (err) {
               console.log(err);
@@ -549,6 +549,7 @@ http.createServer((req, res) => {
           } else {
             if (result.length) {
               let arr = JSON.parse(result[0].circles);
+              data.circlesData.id = uuid.v1();
               arr.push(data.circlesData);
               let changeCircles = `UPDATE circles SET circles = '${JSON.stringify(arr)}' WHERE account = ${data.account}`;
               connection().query(changeCircles, (err, result) => {
@@ -613,6 +614,7 @@ http.createServer((req, res) => {
                   let mergeArr = [];
                   for (let i in result) {
                     if (result[i].length) {
+
                       if (JSON.parse(result[i][0].circles).length) {
                         for (let s in JSON.parse(result[i][0].circles)) {
                           mergeArr.push(JSON.parse(result[i][0].circles)[s])
@@ -658,17 +660,36 @@ http.createServer((req, res) => {
         });
         break;
       case 'A013':
-        let queryCircles = `SELECT * FROM circles WHERE account = ${data.id};`
+        let queryCircles = `SELECT * FROM circles WHERE account = ${data.account};`;
         connection().query(queryCircles, (err, result) => {
           if (err) {
             return false;
           } else {
             let arr = JSON.parse(result[0].circles);
-            console.log(arr)
-
-
+            for (let i in arr) {
+              if (arr[i].id === data.id) {
+                arr[i].comment.push({
+                  nickname: data.nickname,
+                  account: data.account,
+                  commentData: data.commentData
+                });
+              }
+            }
+            let changeComment = `UPDATE circles SET circles = '${JSON.stringify(arr)}' WHERE account = ${data.account}`;
+            connection().query(changeComment, (err, result) => {
+              if (err) {
+                console.log('[SELECT ERROR] - ', err.message);
+                return false;
+              } else {
+                let sendData = {
+                  status: '0000',
+                  msg: '评论成功'
+                };
+                res.end(JSON.stringify(sendData));
+              }
+            });
           }
-        })
+        });
         break;
     }
   })

@@ -10,7 +10,7 @@
       </template>
     </van-nav-bar>
     <div class="c-1" v-if="friendsCircles.length">
-      <section v-for="i in friendsCircles">
+      <section v-for="(i, index) in friendsCircles" :key="index">
         <div class="s-1">
           <div class="s-1-1">
             <van-image width="2rem" height="2rem" fit="cover" loading-icon="user-circle-o" :src="i.photo" />
@@ -29,7 +29,9 @@
           <small>{{ i.date }}</small>
           <van-icon name="other-pay" @click="openCommentPopup(i)" />
         </div>
-        <div class="s-4" v-for="a in i.comment" v-if="a.length">{{ a }}</div>
+        <div class="s-4" v-if="i.comment.length">
+          <p v-for="a in i.comment"><span>{{ a.nickname === null ? a.account:a.nickname }}：</span>{{ a.commentData }}</p>
+        </div>
       </section>
     </div>
     <van-empty v-else description="暂无内容" />
@@ -60,25 +62,29 @@ export default {
   data() {
     return {
       id: '',
+      account: '',
       commentPopup: false,
       commentData: '',
       friendsCircles: [],
     };
   },
   created() {
-    Request({
-      method: 'post',
-      data: {
-        api: ApiConfig.getCircles,
-        account: GetLocalStorage('userData').account,
-      }
-    }).then(res => {
-      if (res.status === '0000') {
-        this.friendsCircles = res.friendsCircles;
-      }
-    })
+    this.init();
   },
   methods: {
+    init() {
+      Request({
+        method: 'post',
+        data: {
+          api: ApiConfig.getCircles,
+          account: GetLocalStorage('userData').account,
+        }
+      }).then(res => {
+        if (res.status === '0000') {
+          this.friendsCircles = res.friendsCircles;
+        }
+      })
+    },
     toBack() {
       this.$router.push('/m3');
     },
@@ -86,7 +92,8 @@ export default {
       this.$router.push('/edit');
     },
     openCommentPopup(e) {
-      this.id = e.account;
+      this.id = e.id;
+      this.account = e.account;
       this.commentPopup = true;
     },
     onSubmitComment() {
@@ -95,14 +102,17 @@ export default {
         data: {
           api: ApiConfig.onSubmitComment,
           id: this.id,
+          account: this.account,
           commentData: this.commentData,
-          account: GetLocalStorage('userData').account,
           nickname: GetLocalStorage('userData').nickname
         }
       }).then(res => {
-        console.log(res)
+        if (res.status === '0000') {
+          this.init();
+          this.commentData = '';
+          this.commentPopup = false;
+        }
       })
-
     }
   }
 }
@@ -159,11 +169,18 @@ export default {
         box-sizing: border-box;
         padding: 5px;
         margin-top: 10px;
-        line-height: 20px;
-        font-size: 13px;
-        color: #455a64;
         background-color: #fafafa;
         border-radius: 5px;
+        p {
+          margin: 0;
+          line-height: 20px;
+          font-size: 13px;
+          color: #000;
+          span {
+            font-size: 13px;
+            color: #455a64;
+          }
+        }
       }
     }
   }
