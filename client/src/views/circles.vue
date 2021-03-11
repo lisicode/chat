@@ -13,26 +13,42 @@
       <section v-for="i in friendsCircles">
         <div class="s-1">
           <div class="s-1-1">
-            <van-image width="2rem" height="2rem" fit="cover" :src="i.photo" />
+            <van-image width="2rem" height="2rem" fit="cover" loading-icon="user-circle-o" :src="i.photo" />
           </div>
           <div class="s-1-2">
             <span>{{ i.nickname === null ? i.account : i.nickname }}</span>
             <p>{{ i.text }}</p>
           </div>
         </div>
-        <van-row class="s-2" gutter="5">
+        <van-row class="s-2">
           <van-col span="12" v-for="s in i.picture">
-            <img :src="s" style="width: 100%;">
+            <img :src="s">
           </van-col>
         </van-row>
         <div class="s-3">
           <small>{{ i.date }}</small>
-          <van-icon name="other-pay"/>
+          <van-icon name="other-pay" @click="openCommentPopup(i)" />
         </div>
-        <div class="s-4">评论内容</div>
+        <div class="s-4" v-for="a in i.comment" v-if="a.length">{{ a }}</div>
       </section>
     </div>
     <van-empty v-else description="暂无内容" />
+    <van-popup v-model="commentPopup" position="top">
+      <van-form @submit="onSubmitComment">
+        <van-field
+            v-model="commentData"
+            center
+            clearable
+            :rules="[{ required: true }]"
+            placeholder="写评论..."
+        >
+          <template #button>
+            <van-button size="small" type="primary" native-type="submit">发送</van-button>
+          </template>
+        </van-field>
+      </van-form>
+    </van-popup>
+
   </div>
 </template>
 
@@ -43,7 +59,10 @@ export default {
   name: 'circles',
   data() {
     return {
-      friendsCircles: []
+      id: '',
+      commentPopup: false,
+      commentData: '',
+      friendsCircles: [],
     };
   },
   created() {
@@ -56,11 +75,8 @@ export default {
     }).then(res => {
       if (res.status === '0000') {
         this.friendsCircles = res.friendsCircles;
-      } else if (res.status === '0001') {
-
       }
     })
-
   },
   methods: {
     toBack() {
@@ -68,6 +84,25 @@ export default {
     },
     toEdit() {
       this.$router.push('/edit');
+    },
+    openCommentPopup(e) {
+      this.id = e.account;
+      this.commentPopup = true;
+    },
+    onSubmitComment() {
+      Request({
+        method: 'post',
+        data: {
+          api: ApiConfig.onSubmitComment,
+          id: this.id,
+          commentData: this.commentData,
+          account: GetLocalStorage('userData').account,
+          nickname: GetLocalStorage('userData').nickname
+        }
+      }).then(res => {
+        console.log(res)
+      })
+
     }
   }
 }
@@ -104,6 +139,12 @@ export default {
       }
       .s-2 {
         margin-top: 10px;
+        .van-col {
+          padding: 2px;
+        }
+        img {
+          width: 100%;
+        }
       }
       .s-3 {
         margin-top: 10px;

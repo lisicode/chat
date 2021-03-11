@@ -657,6 +657,19 @@ http.createServer((req, res) => {
           }
         });
         break;
+      case 'A013':
+        let queryCircles = `SELECT * FROM circles WHERE account = ${data.id};`
+        connection().query(queryCircles, (err, result) => {
+          if (err) {
+            return false;
+          } else {
+            let arr = JSON.parse(result[0].circles);
+            console.log(arr)
+
+
+          }
+        })
+        break;
     }
   })
 }).listen(8080);
