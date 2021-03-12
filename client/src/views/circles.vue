@@ -20,11 +20,9 @@
             <p>{{ i.text }}</p>
           </div>
         </div>
-        <van-row class="s-2">
-          <van-col span="12" v-for="s in i.picture">
-            <img :src="s">
-          </van-col>
-        </van-row>
+        <div class="s-2">
+          <van-image v-for="(s, index) in i.picture" :key="index" width="49%" :src="s"/>
+        </div>
         <div class="s-3">
           <small>{{ i.date }}</small>
           <van-icon name="other-pay" @click="openCommentPopup(i)" />
@@ -50,7 +48,6 @@
         </van-field>
       </van-form>
     </van-popup>
-
   </div>
 </template>
 
@@ -120,7 +117,6 @@ export default {
 
 <style scoped lang="scss">
 .circles {
-  padding-bottom: 60px;
   .c-1 {
     section {
       box-sizing: border-box;
@@ -149,11 +145,11 @@ export default {
       }
       .s-2 {
         margin-top: 10px;
-        .van-col {
-          padding: 2px;
-        }
-        img {
-          width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        .van-image {
+          margin-top: 5px;
         }
       }
       .s-3 {
